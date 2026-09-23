@@ -1,0 +1,376 @@
+{
+  "mapLayers": [
+    {
+      "id": "bmb",
+      "name": "Bomb"
+    },
+    {
+      "id": "sec",
+      "name": "Secure"
+    },
+    {
+      "id": "hst",
+      "name": "Hostage"
+    },
+    {
+      "id": "fh",
+      "name": "Floor hatch"
+    },
+    {
+      "id": "ch",
+      "name": "Ceiling hatch"
+    },
+    {
+      "id": "bw",
+      "name": "Breakable wall"
+    },
+    {
+      "id": "losw",
+      "name": "Line of sight wall"
+    },
+    {
+      "id": "losf",
+      "name": "Line of sight floor"
+    },
+    {
+      "id": "sl",
+      "name": "Skylight"
+    },
+    {
+      "id": "dt",
+      "name": "Drone tunnel"
+    },
+    {
+      "id": "cam",
+      "name": "Security camera"
+    },
+    {
+      "id": "ld",
+      "name": "Ladder"
+    },
+    {
+      "id": "fe",
+      "name": "Fire extinguisher"
+    },
+    {
+      "id": "gp",
+      "name": "Gas pipe"
+    },
+    {
+      "id": "md",
+      "name": "Metal detector"
+    },
+        {
+      "id": "ns",
+      "name": "Noise source"
+    },
+    {
+      "id": "ip",
+      "name": "Insertion point"
+    },
+    {
+      "id": "txt",
+      "name": "Label"
+    },
+    {
+      "id": "cmp",
+      "name": "Compass"
+    },
+    {
+      "id": "lg",
+      "name": "Legend"
+    }
+  ],
+  "staticMapLayers": [
+    {
+      "name": "Wall"
+    },
+    {
+      "name": "Door"
+    },
+    {
+      "name": "Double door"
+    },
+    {
+      "name": "Window"
+    },
+    {
+      "name": "Double window"
+    }
+  ],
+  "floors": [
+    {
+      "number": -1,
+      "name": "Sub-Basement",
+      "css": "neg-one"
+    },
+    {
+      "number": 0,
+      "name": "Basement",
+      "css": "zero"
+    },
+    {
+      "number": 1,
+      "name": "1st Floor",
+      "css": "one"
+    },
+    {
+      "number": 2,
+      "name": "2nd Floor",
+      "css": "two"
+    },
+    {
+      "number": 3,
+      "name": "3rd Floor",
+      "css": "three"
+    },
+    {
+      "number": 4,
+      "name": "4th Floor",
+      "css": "four"
+    },
+    {
+      "number": 5,
+      "name": "5th Floor",
+      "css": "five"
+    },
+    {
+      "number": 10,
+      "name": "Roof"
+    }
+  ],
+  "maps": [
+    {
+      "id": "bank",
+      "name": "Bank",
+      "revision": 11,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "bartlett",
+      "name": "Bartlett University",
+      "revision": 0,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "border",
+      "name": "Border",
+      "revision": 9,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "chalet",
+      "name": "Chalet",
+      "revision": 9,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "closequarters",
+      "name": "Close Quarters",
+      "revision": 2,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 2,
+      "scaleFactor": 2
+    },
+    {
+      "id": "club",
+      "name": "Club House",
+      "revision": 6,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "coastline",
+      "name": "Coastline",
+      "revision": 5,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "casino",
+      "name": "Calypso Casino",
+      "revision": 4,
+      "minFloorNumber": -1,
+      "maxFloorNumber": 5,
+      "scaleFactor": 2
+    },
+    {
+      "id": "consulate",
+      "name": "Consulate",
+      "revision": 8,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "district",
+      "name": "District",
+      "revision": 0,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 1,
+      "scaleFactor": 2
+    },
+    {
+      "id": "emerald",
+      "name": "Emerald Plains",
+      "revision": 7,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "favela",
+      "name": "Favela",
+      "revision": 3,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 4,
+      "scaleFactor": 2
+    },
+    {
+      "id": "fortress",
+      "name": "Fortress",
+      "revision": 9,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 5,
+      "scaleFactor": 2
+    },
+    {
+      "id": "hereford",
+      "name": "Hereford Base",
+      "revision": 4,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 4,
+      "scaleFactor": 1
+    },
+    {
+      "id": "house",
+      "name": "House",
+      "revision": 6,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 1
+    },
+    {
+      "id": "kafe",
+      "name": "Kafe Dostoyevsky",
+      "revision": 5,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 4,
+      "scaleFactor": 2
+    },
+    {
+      "id": "kanal",
+      "name": "Kanal",
+      "revision": 4,
+      "minFloorNumber": -1,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "lair",
+      "name": "Lair",
+      "revision": 8,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "labs",
+      "name": "Nighthaven Labs",
+      "revision": 6,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "oregon",
+      "name": "Oregon",
+      "revision": 5,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 4,
+      "scaleFactor": 2
+    },
+    {
+      "id": "outback",
+      "name": "Outback",
+      "revision": 5,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "plane",
+      "name": "Presidential Plane",
+      "revision": 5,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 4,
+      "scaleFactor": 2
+    },
+    {
+      "id": "skyscraper",
+      "name": "Skyscraper",
+      "revision": 6,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "stadiumalpha",
+      "name": "Stadium Alpha",
+      "revision": 2,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "stadiumbravo",
+      "name": "Stadium Bravo",
+      "revision": 5,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "themepark",
+      "name": "Theme Park",
+      "revision": 6,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "tower",
+      "name": "Tower",
+      "revision": 2,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 5,
+      "scaleFactor": 2
+    },
+    {
+      "id": "villa",
+      "name": "Villa",
+      "revision": 8,
+      "minFloorNumber": 0,
+      "maxFloorNumber": 3,
+      "scaleFactor": 2
+    },
+    {
+      "id": "yacht",
+      "name": "Yacht",
+      "revision": 4,
+      "minFloorNumber": 1,
+      "maxFloorNumber": 5,
+      "scaleFactor": 2
+    }
+  ]
+}

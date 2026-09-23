@@ -1,0 +1,994 @@
+{
+  "bank": [
+    {
+      "id": "0-4",
+      "label": "B Lockers / CCTV",
+      "floor": 0,
+      "rooms": [
+        "Lockers",
+        "CCTV"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Open Area / Staff Room",
+      "floor": 1,
+      "rooms": [
+        "Open Area",
+        "Staff Room"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Tellers / Archives",
+      "floor": 1,
+      "rooms": [
+        "Tellers",
+        "Archives"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F CEO Office / Executive Lounge",
+      "floor": 2,
+      "rooms": [
+        "CEO Office",
+        "Executive Lounge"
+      ]
+    }
+  ],
+  "bartlett": [
+    {
+      "id": "1-2",
+      "label": "1F Piano / Kitchen",
+      "floor": 1,
+      "rooms": [
+        "Piano",
+        "Kitchen"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Patio / Library",
+      "floor": 1,
+      "rooms": [
+        "Patio",
+        "Library"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Trophy / Museum",
+      "floor": 2,
+      "rooms": [
+        "Trophy",
+        "Museum"
+      ]
+    },
+    {
+      "id": "2-4",
+      "label": "2F Classroom / Top Library",
+      "floor": 2,
+      "rooms": [
+        "Classroom",
+        "Top Library"
+      ]
+    }
+  ],
+  "border": [
+    {
+      "id": "1-1",
+      "label": "1F Supply / Customs",
+      "floor": 1,
+      "rooms": [
+        "Supply",
+        "Customs"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Workshop / Ventilation",
+      "floor": 1,
+      "rooms": [
+        "Workshop",
+        "Ventilation"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Bathroom / Tellers",
+      "floor": 1,
+      "rooms": [
+        "Bathroom",
+        "Tellers"
+      ]
+    },
+    {
+      "id": "2-4",
+      "label": "2F Armory / Archives",
+      "floor": 2,
+      "rooms": [
+        "Armory",
+        "Archives"
+      ]
+    }
+  ],
+  "chalet": [
+    {
+      "id": "0-4",
+      "label": "B Wine / Garage",
+      "floor": 0,
+      "rooms": [
+        "Wine",
+        "Garage"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Gaming / Bar",
+      "floor": 1,
+      "rooms": [
+        "Gaming",
+        "Bar"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Dining / Kitchen",
+      "floor": 1,
+      "rooms": [
+        "Dining",
+        "Kitchen"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Office / Master",
+      "floor": 2,
+      "rooms": [
+        "Office",
+        "Master"
+      ]
+    }
+  ],
+  "closequarters": [],
+  "club": [
+    {
+      "id": "0-4",
+      "label": "B Church / Arsenal",
+      "floor": 0,
+      "rooms": [
+        "Church",
+        "Arsenal"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Bar / Stage",
+      "floor": 1,
+      "rooms": [
+        "Bar",
+        "Stage"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Gym / Bedroom",
+      "floor": 2,
+      "rooms": [
+        "Gym",
+        "Bedroom"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F CCTV / Cash",
+      "floor": 2,
+      "rooms": [
+        "CCTV",
+        "Cash"
+      ]
+    }
+  ],
+  "coastline": [
+    {
+      "id": "1-3",
+      "label": "1F Kitchen / Service Entrance",
+      "floor": 1,
+      "rooms": [
+        "Kitchen",
+        "Service Entrance"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Blue Bar / Sunrise Bar",
+      "floor": 1,
+      "rooms": [
+        "Blue Bar",
+        "Sunrise Bar"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Billiards / Hookah Lounge",
+      "floor": 2,
+      "rooms": [
+        "Billiards",
+        "Hookah Lounge"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Penthouse / Theater",
+      "floor": 2,
+      "rooms": [
+        "Penthouse",
+        "Theater"
+      ]
+    }
+  ],
+  "casino": [
+    {
+      "id": "0-4",
+      "label": "B CCTV / Checkpoint",
+      "floor": 0,
+      "rooms": [
+        "CCTV",
+        "Checkpoint"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Secret / Poker",
+      "floor": 1,
+      "rooms": [
+        "Secret",
+        "Poker"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Betting / Jersey",
+      "floor": 1,
+      "rooms": [
+        "Betting",
+        "Jersey"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Credit / Cigar",
+      "floor": 2,
+      "rooms": [
+        "Credit",
+        "Cigar"
+      ]
+    }
+  ],
+  "consulate": [
+    {
+      "id": "0-4",
+      "label": "B Cafeteria / Garage",
+      "floor": 0,
+      "rooms": [
+        "Cafeteria",
+        "Garage"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Exposition / Piano",
+      "floor": 1,
+      "rooms": [
+        "Exposition",
+        "Piano"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Consul Office / Meeting",
+      "floor": 2,
+      "rooms": [
+        "Consul Office",
+        "Meeting"
+      ]
+    }
+  ],
+  "district": [],
+  "emerald": [
+    {
+      "id": "1-3",
+      "label": "1F Lounge / Bar",
+      "floor": 1,
+      "rooms": [
+        "Lounge",
+        "Bar"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Dining / Trash",
+      "floor": 1,
+      "rooms": [
+        "Dining",
+        "Trash"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F CEO / Admin",
+      "floor": 2,
+      "rooms": [
+        "CEO",
+        "Admin"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Meeting / Statue",
+      "floor": 2,
+      "rooms": [
+        "Meeting",
+        "Statue"
+      ]
+    }
+  ],
+  "favela": [
+    {
+      "id": "1-3",
+      "label": "1F Pink / Pink Kitchen",
+      "floor": 1,
+      "rooms": [
+        "Pink",
+        "Pink Kitchen"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Yellow / Green",
+      "floor": 1,
+      "rooms": [
+        "Yellow",
+        "Green"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Storage / Servers",
+      "floor": 2,
+      "rooms": [
+        "Storage",
+        "Servers"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Bunks / Servers",
+      "floor": 2,
+      "rooms": [
+        "Bunks",
+        "Servers"
+      ]
+    }
+  ],
+  "fortress": [
+    {
+      "id": "1-3",
+      "label": "1F Waiting / Cafeteria",
+      "floor": 1,
+      "rooms": [
+        "Waiting",
+        "Cafeteria"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Hammam / Sitting",
+      "floor": 1,
+      "rooms": [
+        "Hammam",
+        "Sitting"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Horse / Bathroom",
+      "floor": 2,
+      "rooms": [
+        "Horse",
+        "Bathroom"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Dormitory / Gaming",
+      "floor": 2,
+      "rooms": [
+        "Dormitory",
+        "Gaming"
+      ]
+    }
+  ],
+  "hereford": [
+    {
+      "id": "0-4",
+      "label": "B Brewery / Fermentation",
+      "floor": 0,
+      "rooms": [
+        "Brewery",
+        "Fermentation"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Kitchen / Dining",
+      "floor": 1,
+      "rooms": [
+        "Kitchen",
+        "Dining"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Kids / Master",
+      "floor": 2,
+      "rooms": [
+        "Kids",
+        "Master"
+      ]
+    },
+    {
+      "id": "3-1",
+      "label": "3F Armory / Tractor",
+      "floor": 3,
+      "rooms": [
+        "Armory",
+        "Tractor"
+      ]
+    }
+  ],
+  "house": [
+    {
+      "id": "0-4",
+      "label": "B Garage / Gym",
+      "floor": 0,
+      "rooms": [
+        "Garage",
+        "Gym"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F TV / Music",
+      "floor": 1,
+      "rooms": [
+        "TV",
+        "Music"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Car / Pink",
+      "floor": 2,
+      "rooms": [
+        "Car",
+        "Pink"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Master / Car",
+      "floor": 2,
+      "rooms": [
+        "Master",
+        "Car"
+      ]
+    }
+  ],
+  "kafe": [
+    {
+      "id": "1-4",
+      "label": "1F Cooking / Service",
+      "floor": 1,
+      "rooms": [
+        "Cooking",
+        "Service"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Mining / Dining",
+      "floor": 2,
+      "rooms": [
+        "Mining",
+        "Dining"
+      ]
+    },
+    {
+      "id": "2-3",
+      "label": "2F Dining / Reading",
+      "floor": 2,
+      "rooms": [
+        "Dining",
+        "Reading"
+      ]
+    },
+    {
+      "id": "3-1",
+      "label": "3F Cocktail Entrance / Bar",
+      "floor": 3,
+      "rooms": [
+        "Cocktail Entrance",
+        "Bar"
+      ]
+    }
+  ],
+  "kanal": [
+    {
+      "id": "0-4",
+      "label": "B Supply / Kayaks",
+      "floor": 0,
+      "rooms": [
+        "Supply",
+        "Kayaks"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Map / Security",
+      "floor": 1,
+      "rooms": [
+        "Map",
+        "Security"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Meeting / Lounge",
+      "floor": 1,
+      "rooms": [
+        "Meeting",
+        "Lounge"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Control / Server",
+      "floor": 2,
+      "rooms": [
+        "Control",
+        "Server"
+      ]
+    }
+  ],
+  "lair": [
+    {
+      "id": "0-4",
+      "label": "B Toxin / Support",
+      "floor": 0,
+      "rooms": [
+        "Toxin",
+        "Support"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Bunks / CCTV",
+      "floor": 1,
+      "rooms": [
+        "Bunks",
+        "CCTV"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Booth / Maintenance",
+      "floor": 1,
+      "rooms": [
+        "Booth",
+        "Maintenance"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Mask / Six",
+      "floor": 2,
+      "rooms": [
+        "Mask",
+        "Six"
+      ]
+    }
+  ],
+  "labs": [
+    {
+      "id": "0-4",
+      "label": "B Tank / Assembly",
+      "floor": 0,
+      "rooms": [
+        "Tank",
+        "Assembly"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Pantry / Cafeteria",
+      "floor": 1,
+      "rooms": [
+        "Pantry",
+        "Cafeteria"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Warehouse / Storage",
+      "floor": 1,
+      "rooms": [
+        "Warehouse",
+        "Storage"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Command / Server",
+      "floor": 2,
+      "rooms": [
+        "Command",
+        "Server"
+      ]
+    }
+  ],
+  "oregon": [
+    {
+      "id": "0-4",
+      "label": "B Laundry / Supply",
+      "floor": 0,
+      "rooms": [
+        "Laundry",
+        "Supply"
+      ]
+    },
+    {
+      "id": "1-2",
+      "label": "1F Kitchen / Dining",
+      "floor": 1,
+      "rooms": [
+        "Kitchen",
+        "Dining"
+      ]
+    },
+    {
+      "id": "1-3",
+      "label": "1F Meeting Hall / Kitchen",
+      "floor": 1,
+      "rooms": [
+        "Meeting Hall",
+        "Kitchen"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Kids Dorms / Dorms Main Hall",
+      "floor": 2,
+      "rooms": [
+        "Kids Dorms",
+        "Dorms Main Hall"
+      ]
+    }
+  ],
+  "outback": [
+    {
+      "id": "1-3",
+      "label": "1F Red / Green",
+      "floor": 1,
+      "rooms": [
+        "Red",
+        "Green"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Kitchen / Shop",
+      "floor": 1,
+      "rooms": [
+        "Kitchen",
+        "Shop"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Laundry / Piano",
+      "floor": 2,
+      "rooms": [
+        "Laundry",
+        "Piano"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Party / Office",
+      "floor": 2,
+      "rooms": [
+        "Party",
+        "Office"
+      ]
+    }
+  ],
+  "plane": [
+    {
+      "id": "1-3",
+      "label": "1F Cargo / Luggage",
+      "floor": 1,
+      "rooms": [
+        "Cargo",
+        "Luggage"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Office / Pantry",
+      "floor": 2,
+      "rooms": [
+        "Office",
+        "Pantry"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Bedroom / Staff",
+      "floor": 2,
+      "rooms": [
+        "Bedroom",
+        "Staff"
+      ]
+    }
+  ],
+  "skyscraper": [
+    {
+      "id": "1-3",
+      "label": "1F BBQ / Kitchen",
+      "floor": 1,
+      "rooms": [
+        "BBQ",
+        "Kitchen"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Bedroom / Bathroom",
+      "floor": 1,
+      "rooms": [
+        "Bedroom",
+        "Bathroom"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Tea / Karaoke",
+      "floor": 2,
+      "rooms": [
+        "Tea",
+        "Karaoke"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Office / Museum",
+      "floor": 2,
+      "rooms": [
+        "Office",
+        "Museum"
+      ]
+    }
+  ],
+  "stadiumalpha": [
+    {
+      "id": "1-3",
+      "label": "1F Dining / Kitchen",
+      "floor": 1,
+      "rooms": [
+        "Dining",
+        "Kitchen"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Closet / Target",
+      "floor": 2,
+      "rooms": [
+        "Closet",
+        "Target"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Kids / Bunk",
+      "floor": 2,
+      "rooms": [
+        "Kids",
+        "Bunk"
+      ]
+    }
+  ],
+  "stadiumbravo": [
+    {
+      "id": "1-3",
+      "label": "1F Kitchen / Supply",
+      "floor": 1,
+      "rooms": [
+        "Kitchen",
+        "Supply"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Armory Desk / Archives",
+      "floor": 2,
+      "rooms": [
+        "Armory Desk",
+        "Archives"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Penthouse / VIP",
+      "floor": 2,
+      "rooms": [
+        "Penthouse",
+        "VIP"
+      ]
+    }
+  ],
+  "themepark": [
+    {
+      "id": "1-3",
+      "label": "1F Throne / Armory",
+      "floor": 1,
+      "rooms": [
+        "Throne",
+        "Armory"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Lab / Drug",
+      "floor": 1,
+      "rooms": [
+        "Lab",
+        "Drug"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Bar / Initiation",
+      "floor": 2,
+      "rooms": [
+        "Bar",
+        "Initiation"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Day Care / Kitchen",
+      "floor": 2,
+      "rooms": [
+        "Day Care",
+        "Kitchen"
+      ]
+    }
+  ],
+  "tower": [
+    {
+      "id": "1-3",
+      "label": "1F Tea / Bar",
+      "floor": 1,
+      "rooms": [
+        "Tea",
+        "Bar"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Restaurant / Bird",
+      "floor": 1,
+      "rooms": [
+        "Restaurant",
+        "Bird"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Lantern / Gift Shop",
+      "floor": 2,
+      "rooms": [
+        "Lantern",
+        "Gift Shop"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Media / Exhibit",
+      "floor": 2,
+      "rooms": [
+        "Media",
+        "Exhibit"
+      ]
+    }
+  ],
+  "villa": [
+    {
+      "id": "1-3",
+      "label": "1F Living / Library",
+      "floor": 1,
+      "rooms": [
+        "Living",
+        "Library"
+      ]
+    },
+    {
+      "id": "1-4",
+      "label": "1F Kitchen / Dining",
+      "floor": 1,
+      "rooms": [
+        "Kitchen",
+        "Dining"
+      ]
+    },
+    {
+      "id": "2-1",
+      "label": "2F Bar / Aviator",
+      "floor": 2,
+      "rooms": [
+        "Bar",
+        "Aviator"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Statue / Trophy",
+      "floor": 2,
+      "rooms": [
+        "Statue",
+        "Trophy"
+      ]
+    }
+  ],
+  "yacht": [
+    {
+      "id": "1-4",
+      "label": "1F Ladder / Storage",
+      "floor": 1,
+      "rooms": [
+        "Ladder",
+        "Storage"
+      ]
+    },
+    {
+      "id": "2-2",
+      "label": "2F Control / Kitchen",
+      "floor": 2,
+      "rooms": [
+        "Control",
+        "Kitchen"
+      ]
+    },
+    {
+      "id": "2-3",
+      "label": "2F Cafeteria / Dorms",
+      "floor": 2,
+      "rooms": [
+        "Cafeteria",
+        "Dorms"
+      ]
+    },
+    {
+      "id": "4-1",
+      "label": "4F Cockpit / Maps",
+      "floor": 4,
+      "rooms": [
+        "Cockpit",
+        "Maps"
+      ]
+    }
+  ]
+}

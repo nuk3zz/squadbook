@@ -1,0 +1,15 @@
+# Local Supabase connection settings. Never commit the real file.
+dist/data/supabase-config.js
+dist/data/supabase-config.json
+
+# Environment and local credential files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local/editor noise
+.DS_Store
+node_modules/
+work/
