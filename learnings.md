@@ -69,8 +69,10 @@
 ## 2026-09-23 — Desktop blueprint controls
 
 - Ctrl plus wheel on Windows/Linux and Command plus wheel on macOS zooms around the pointer position from 1x to 4x.
+- Ctrl/Command plus left-drag pans a zoomed blueprint like a hand tool; pointer capture keeps the drag active when the cursor leaves the image.
 - A normal wheel continues scrolling the page; in expanded mode it moves an already-zoomed blueprint.
 - Double-click resets the blueprint to its original framing.
+- A height-constrained viewer needs both `max-width: 100%` and `max-height: 100%` with auto dimensions. `height: 100%` can leave an intrinsic-size image clipped instead of fitted.
 
 ## 2026-09-23 — Local strategy editor
 

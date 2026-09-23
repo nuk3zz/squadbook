@@ -39,7 +39,7 @@ Optional gadget references were deliberately left out to keep the match-time too
 
 - A selected floor blueprint appears above the strategy list and is carried into the opened strategy.
 - Each floor is automatically cropped around the playable layout and exported as an 800 px JPEG.
-- One finger keeps scrolling the page normally; two fingers zoom and move the blueprint up to 4x on phones.
+- One finger keeps scrolling the page normally; two fingers zoom and move the blueprint up to 4x on phones. Desktop blueprints fit fully at 1x, use Ctrl/Command plus wheel to zoom, and Ctrl/Command plus drag as a hand tool.
 - Roof layers are hidden from the match-time floor selector, and the embedded desktop blueprint is height-limited while Expand retains the large view.
 - Strategy operator recommendations use plain icons as the primary language; Attack and Defense show only their corresponding roster, and names remain available as accessibility labels and hover titles.
 - Every visual reference is a screenshot plus optional short note and a side-specific tactical label. The strategy view shows only labels actually used and can filter the gallery without changing the saved order. Desktop users can choose a file or paste a screenshot with Ctrl/Command+V.

@@ -352,9 +352,12 @@
       -webkit-user-drag: none;
     }
 
+    .blueprint-canvas.hand-ready { cursor: grab; }
+    .blueprint-canvas.is-panning { cursor: grabbing; }
+
     @media (min-width: 761px) {
-      .browse .blueprint-card:not(.expanded) .blueprint-canvas { height: min(38vh, 390px); min-height: 260px; }
-      .browse .blueprint-card:not(.expanded) .blueprint-canvas img { width: auto; max-width: 100%; height: 100%; object-fit: contain; }
+      .blueprint-card:not(.expanded) .blueprint-canvas { height: min(38vh, 390px); min-height: 260px; }
+      .blueprint-card:not(.expanded) .blueprint-canvas img { position: absolute; inset: 0; width: auto; max-width: 100%; height: auto; max-height: 100%; margin: auto; object-fit: contain; }
     }
 
     .blueprint-loading {
@@ -383,12 +386,16 @@
 
     .blueprint-card.expanded .blueprint-canvas {
       height: calc(100vh - 94px);
-      display: block;
+      display: grid;
     }
 
     .blueprint-card.expanded .blueprint-canvas img {
-      width: 100%;
-      max-width: none;
+      position: absolute;
+      inset: 0;
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      max-height: 100%;
       margin: auto;
     }
 
@@ -779,7 +786,7 @@
           <div class="blueprint-canvas" id="blueprint-canvas">
             <div class="blueprint-loading">Loading blueprint…</div>
           </div>
-          <div class="blueprint-source">Map reference from <a href="https://www.r6calls.com/" target="_blank" rel="noreferrer">R6Calls</a> · Two fingers or Ctrl/⌘ + wheel to zoom</div>
+          <div class="blueprint-source">Map reference from <a href="https://www.r6calls.com/" target="_blank" rel="noreferrer">R6Calls</a> · Two fingers on mobile · Ctrl/⌘ + wheel to zoom · Ctrl/⌘ + drag to move</div>
         </section>
       </div>
 
@@ -914,7 +921,7 @@
       defense: "alibi aruni azami bandit castle caveira clash denari doc echo ela fenrir frost goyo jager kaid kapkan lesion maestro melusi mira mozzie mute oryx pulse rook sentry skopos smoke solis tachanka thorn thunderbird tubarao valkyrie vigil wamai warden".split(" ")
     };
     const referenceLabelsBySide = {
-      attack: ["Plant Spot", "Map Control", "Walls to Breach", "LOS (Line of sights)", "Drone Placements", "Vertical Play", "Other"],
+      attack: ["Plant Spot", "Map Control", "Walls to Breach", "LOS (Line of sights)", "Smoke / Sense", "Drone Placements", "Vertical Play", "Other"],
       defense: ["Rotations", "Map Control", "Walls to Hold", "LOS (Line of sights)", "Camera Placements", "Vertical Play", "Other"]
     };
     const legacyClubSiteIds = {
@@ -963,7 +970,7 @@
     const referenceEditorList = document.querySelector("#reference-editor-list");
     let playerProfile = null;
     let pendingPhoto = "";
-    const gesture = { scale: 1, x: 0, y: 0, startScale: 1, startX: 0, startY: 0, startDistance: 0, contentX: 0, contentY: 0 };
+    const gesture = { scale: 1, x: 0, y: 0, startScale: 1, startX: 0, startY: 0, startDistance: 0, contentX: 0, contentY: 0, dragging: false, pointerId: null };
 
     function initials(name) {
       return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "?";
@@ -1276,10 +1283,14 @@
     }
 
     function clampGesture(image) {
-      const minX = Math.min(0, blueprintCanvas.clientWidth - image.clientWidth * gesture.scale);
-      const minY = Math.min(0, blueprintCanvas.clientHeight - image.clientHeight * gesture.scale);
-      gesture.x = Math.max(minX, Math.min(0, gesture.x));
-      gesture.y = Math.max(minY, Math.min(0, gesture.y));
+      const scaledWidth = image.clientWidth * gesture.scale;
+      const scaledHeight = image.clientHeight * gesture.scale;
+      const minX = scaledWidth > blueprintCanvas.clientWidth ? blueprintCanvas.clientWidth - image.offsetLeft - scaledWidth : 0;
+      const maxX = scaledWidth > blueprintCanvas.clientWidth ? -image.offsetLeft : 0;
+      const minY = scaledHeight > blueprintCanvas.clientHeight ? blueprintCanvas.clientHeight - image.offsetTop - scaledHeight : 0;
+      const maxY = scaledHeight > blueprintCanvas.clientHeight ? -image.offsetTop : 0;
+      gesture.x = Math.max(minX, Math.min(maxX, gesture.x));
+      gesture.y = Math.max(minY, Math.min(maxY, gesture.y));
       image.style.transform = `translate(${gesture.x}px, ${gesture.y}px) scale(${gesture.scale})`;
     }
 
@@ -1287,6 +1298,9 @@
       gesture.scale = 1;
       gesture.x = 0;
       gesture.y = 0;
+      gesture.dragging = false;
+      gesture.pointerId = null;
+      blueprintCanvas.classList.remove("is-panning");
       const image = blueprintCanvas.querySelector("img");
       if (image) image.style.transform = "";
     }
@@ -1295,10 +1309,12 @@
       if (event.touches.length !== 2) return;
       event.preventDefault();
       const center = touchCenter(event.touches);
+      const image = blueprintCanvas.querySelector("img");
+      if (!image) return;
       gesture.startScale = gesture.scale;
       gesture.startDistance = touchDistance(event.touches);
-      gesture.contentX = (center.x - gesture.x) / gesture.scale;
-      gesture.contentY = (center.y - gesture.y) / gesture.scale;
+      gesture.contentX = (center.x - image.offsetLeft - gesture.x) / gesture.scale;
+      gesture.contentY = (center.y - image.offsetTop - gesture.y) / gesture.scale;
     }, { passive: false });
 
     blueprintCanvas.addEventListener("touchmove", event => {
@@ -1308,10 +1324,54 @@
       event.preventDefault();
       const center = touchCenter(event.touches);
       gesture.scale = Math.max(1, Math.min(4, gesture.startScale * touchDistance(event.touches) / gesture.startDistance));
-      gesture.x = center.x - gesture.contentX * gesture.scale;
-      gesture.y = center.y - gesture.contentY * gesture.scale;
+      gesture.x = center.x - image.offsetLeft - gesture.contentX * gesture.scale;
+      gesture.y = center.y - image.offsetTop - gesture.contentY * gesture.scale;
       clampGesture(image);
     }, { passive: false });
+
+    blueprintCanvas.addEventListener("pointerdown", event => {
+      if (event.pointerType !== "mouse" || event.button !== 0 || (!event.ctrlKey && !event.metaKey)) return;
+      const image = blueprintCanvas.querySelector("img");
+      if (!image) return;
+      event.preventDefault();
+      gesture.dragging = true;
+      gesture.pointerId = event.pointerId;
+      gesture.startX = event.clientX - gesture.x;
+      gesture.startY = event.clientY - gesture.y;
+      blueprintCanvas.classList.add("is-panning");
+      blueprintCanvas.setPointerCapture(event.pointerId);
+    });
+
+    blueprintCanvas.addEventListener("pointermove", event => {
+      if (!gesture.dragging || event.pointerId !== gesture.pointerId) return;
+      const image = blueprintCanvas.querySelector("img");
+      if (!image) return;
+      event.preventDefault();
+      gesture.x = event.clientX - gesture.startX;
+      gesture.y = event.clientY - gesture.startY;
+      clampGesture(image);
+    });
+
+    function stopBlueprintPan(event) {
+      if (!gesture.dragging || (event.pointerId !== undefined && event.pointerId !== gesture.pointerId)) return;
+      gesture.dragging = false;
+      if (gesture.pointerId !== null && blueprintCanvas.hasPointerCapture(gesture.pointerId)) blueprintCanvas.releasePointerCapture(gesture.pointerId);
+      gesture.pointerId = null;
+      blueprintCanvas.classList.remove("is-panning");
+    }
+
+    blueprintCanvas.addEventListener("pointerup", stopBlueprintPan);
+    blueprintCanvas.addEventListener("pointercancel", stopBlueprintPan);
+    window.addEventListener("keydown", event => {
+      if (event.key === "Control" || event.key === "Meta") blueprintCanvas.classList.add("hand-ready");
+    });
+    window.addEventListener("keyup", event => {
+      if (event.key === "Control" || event.key === "Meta") blueprintCanvas.classList.remove("hand-ready");
+    });
+    window.addEventListener("blur", () => {
+      blueprintCanvas.classList.remove("hand-ready");
+      stopBlueprintPan({});
+    });
 
     blueprintCanvas.addEventListener("wheel", event => {
       const image = blueprintCanvas.querySelector("img");
@@ -1322,11 +1382,11 @@
         const pointerY = event.clientY - rect.top;
         const oldScale = gesture.scale;
         const nextScale = Math.max(1, Math.min(4, oldScale * Math.exp(-event.deltaY * .0025)));
-        const contentX = (pointerX - gesture.x) / oldScale;
-        const contentY = (pointerY - gesture.y) / oldScale;
+        const contentX = (pointerX - image.offsetLeft - gesture.x) / oldScale;
+        const contentY = (pointerY - image.offsetTop - gesture.y) / oldScale;
         gesture.scale = nextScale;
-        gesture.x = pointerX - contentX * nextScale;
-        gesture.y = pointerY - contentY * nextScale;
+        gesture.x = pointerX - image.offsetLeft - contentX * nextScale;
+        gesture.y = pointerY - image.offsetTop - contentY * nextScale;
         clampGesture(image);
         return;
       }
