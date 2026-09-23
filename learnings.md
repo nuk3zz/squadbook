@@ -126,3 +126,8 @@
 - Anonymous sign-in was saved in the Supabase dashboard and the local ignored configuration connected successfully with the browser-safe publishable key.
 - The running app reached **Shared** mode, migrated the existing local player profile, loaded shared data, and produced no browser warnings or errors.
 - The real project configuration remains untracked and excluded from public repository scans.
+
+## 2026-09-24 — Static deployment
+
+- GitHub Pages can publish the existing `dist/` directory at no hosting cost for this public repository.
+- The deployment workflow generates the ignored Supabase config from GitHub Actions secrets inside the runner, so the real values never enter Git history.

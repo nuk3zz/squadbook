@@ -45,7 +45,7 @@ Optional gadget references were deliberately left out to keep the match-time too
 
 ## Stage 3 — Shared squad version
 
-- Status: implementation complete; awaiting connection to the user's Supabase project.
+- Status: complete and connected to the squad's Supabase project.
 - Added anonymous session support with no email, password, or verification step.
 - Added shared player profiles, strategies, private image paths, and realtime strategy refresh.
 - Added automatic one-time migration of the current browser's local profile and strategies.
@@ -63,7 +63,7 @@ Optional gadget references were deliberately left out to keep the match-time too
 
 ## Stage 5 — Publish and match test
 
-- Deploy to a private squad URL.
+- Deploy the static site through GitHub Pages, injecting the ignored Supabase browser configuration from repository secrets.
 - Test on phones and second monitors during real matches.
 - Remove any interaction that slows down map-to-strategy access.
 - Add offline caching only if the squad actually needs it.
