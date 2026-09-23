@@ -16,3 +16,5 @@ Source: user request on 2026-09-24.
 - When a different player edits a strategy, retain the original creator and show overlapping creator/editor avatars plus both `Added by` and `Edited by` names.
 - Fit the whole blueprint inside the desktop viewer at 1x instead of clipping it, and support Ctrl/Command plus mouse drag as a hand tool while retaining two-finger mobile gestures.
 - Keep reference thumbnails unobstructed by removing the numbered `Reference 1`, `Reference 2`, and similar overlays; show only the tactical label and optional note below.
+- Add a compact `01`, `02`, `03` sequence beside the text label below each thumbnail. Restart at `01` for every strategy and preserve the original number while filtering.
+- Keep the homepage blueprint unchanged, but collapse it by default inside an opened strategy so visual references appear first; Expand opens the blueprint and Close returns it to the collapsed state.

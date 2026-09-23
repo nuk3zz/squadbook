@@ -536,6 +536,8 @@
       margin-bottom: 14px;
     }
 
+    .detail .media-grid { grid-template-columns: 1fr; }
+
     .media-slot {
       display: grid;
       place-items: center;
@@ -560,6 +562,7 @@
     .reference-filter.active { border-color: var(--accent); color: var(--accent); }
     .reference-card { min-width: 0; }
     .reference-card .media-slot { min-height: 150px; }
+    .reference-index { display: inline-flex; margin: 7px 2px 0 4px; color: var(--muted); font-size: .72rem; font-weight: 900; font-variant-numeric: tabular-nums; }
     .reference-tag { display: inline-flex; margin: 7px 4px 0; border-radius: 999px; padding: 4px 7px; background: rgba(232,255,90,.1); color: var(--accent); font-size: .68rem; font-weight: 900; text-transform: uppercase; }
     .reference-note { margin: 7px 4px 0; color: var(--text); font-size: .82rem; overflow-wrap: anywhere; }
     .reference-empty { grid-column: 1 / -1; min-height: 150px; }
@@ -579,6 +582,10 @@
     }
 
     .media-slot.blueprint-slot .blueprint-canvas { min-height: 310px; }
+    .media-slot.blueprint-slot.collapsed { min-height: 0; }
+    .media-slot.blueprint-slot.collapsed .blueprint-card { height: auto; }
+    .blueprint-card.detail-collapsed .blueprint-canvas,
+    .blueprint-card.detail-collapsed .blueprint-source { display: none; }
 
     .quick-grid {
       display: grid;
@@ -949,6 +956,7 @@
     const detail = document.querySelector("#detail");
     const blueprintCard = document.querySelector("#blueprint-card");
     const blueprintCanvas = document.querySelector("#blueprint-canvas");
+    const detailBlueprintHome = document.querySelector("#detail-blueprint-home");
     const addStrategyButton = document.querySelector("#add-strategy");
     const editStrategyButton = document.querySelector("#edit-strategy");
     const strategyDialog = document.querySelector("#strategy-dialog");
@@ -1737,12 +1745,14 @@
       filters.innerHTML = ["All", ...orderedLabels].map(label => `
         <button class="reference-filter ${activeReferenceFilter === label ? "active" : ""}" type="button" data-reference-filter="${escapeHtml(label)}">${escapeHtml(label)}</button>
       `).join("");
+      const numberedReferences = references.map((reference, index) => ({ reference, number: index + 1 }));
       const visibleReferences = activeReferenceFilter === "All"
-        ? references
-        : references.filter(reference => reference.label === activeReferenceFilter);
-      container.innerHTML = visibleReferences.map((reference, index) => `
+        ? numberedReferences
+        : numberedReferences.filter(item => item.reference.label === activeReferenceFilter);
+      container.innerHTML = visibleReferences.map(({ reference, number }) => `
         <div class="reference-card">
-          <div class="media-slot small"><img src="${reference.image}" alt="${escapeHtml(reference.label || "Strategy reference")} ${index + 1}"></div>
+          <div class="media-slot small"><img src="${reference.image}" alt="${escapeHtml(reference.label || "Strategy reference")} ${number}"></div>
+          <span class="reference-index">${String(number).padStart(2, "0")}</span>
           <span class="reference-tag">${escapeHtml(reference.label || "Other")}</span>
           ${reference.note ? `<p class="reference-note">${escapeHtml(reference.note)}</p>` : ""}
         </div>
@@ -1766,7 +1776,13 @@
       `).join("");
       activeReferenceFilter = "All";
       renderStrategyReferences(item);
-      document.querySelector("#detail-blueprint-home").append(blueprintCard);
+      blueprintCard.classList.remove("expanded");
+      blueprintCard.classList.add("detail-collapsed");
+      detailBlueprintHome.classList.add("collapsed");
+      document.querySelector("#blueprint-expand").textContent = "Expand";
+      document.body.style.overflow = "";
+      resetBlueprintGesture();
+      detailBlueprintHome.append(blueprintCard);
       browse.classList.add("hidden");
       detail.classList.add("active");
       window.scrollTo({ top: 0, behavior: "instant" });
@@ -1774,6 +1790,11 @@
 
     document.querySelector("#back").addEventListener("click", () => {
       document.querySelector("#blueprint-home").append(blueprintCard);
+      blueprintCard.classList.remove("expanded", "detail-collapsed");
+      detailBlueprintHome.classList.remove("collapsed");
+      document.querySelector("#blueprint-expand").textContent = "Expand";
+      document.body.style.overflow = "";
+      resetBlueprintGesture();
       detail.classList.remove("active");
       browse.classList.remove("hidden");
       activeStrategy = null;
@@ -1787,7 +1808,19 @@
     });
 
     document.querySelector("#blueprint-expand").addEventListener("click", event => {
-      const expanded = blueprintCard.classList.toggle("expanded");
+      let expanded;
+      if (detail.classList.contains("active") && blueprintCard.classList.contains("detail-collapsed")) {
+        blueprintCard.classList.remove("detail-collapsed");
+        detailBlueprintHome.classList.remove("collapsed");
+        blueprintCard.classList.add("expanded");
+        expanded = true;
+      } else {
+        expanded = blueprintCard.classList.toggle("expanded");
+        if (!expanded && detail.classList.contains("active")) {
+          blueprintCard.classList.add("detail-collapsed");
+          detailBlueprintHome.classList.add("collapsed");
+        }
+      }
       resetBlueprintGesture();
       event.currentTarget.textContent = expanded ? "Close" : "Expand";
       document.body.style.overflow = expanded ? "hidden" : "";

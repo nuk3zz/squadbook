@@ -143,6 +143,8 @@
 - Strategy references work better as an ordered list of compressed screenshots and optional notes than fixed plant/post-plant slots.
 - Side-specific labels keep a large reference gallery scannable: Attack and Defense use different tactical taxonomies, and the detail view only shows filter chips for labels present in that strategy.
 - Number overlays add no useful meaning once references have tactical labels and can hide the exact angle players need to see, so thumbnails should remain unobstructed.
+- Squad callouts still benefit from stable reference numbers; place `01`, `02`, and so on below the image and calculate them before filtering so a photo's number never changes.
+- Reusing the same blueprint node still works with different priorities: keep it visible during round selection, then apply a detail-only collapsed class so strategy screenshots lead without loading or duplicating another map.
 - Strategy author avatars should resolve by stable profile ID rather than display name, so renamed players and duplicate-looking names still show the correct photo.
 - Creator and latest-editor identity need separate fields: updating the author fields would erase authorship, while an optional editor pair supports compact overlapping avatars and both names.
 - A focusable image box can support both ordinary file selection and direct screenshot paste without adding another dependency.

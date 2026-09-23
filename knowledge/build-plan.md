@@ -38,6 +38,7 @@ Optional gadget references were deliberately left out to keep the match-time too
 ## Visual-content decision
 
 - A selected floor blueprint appears above the strategy list and is carried into the opened strategy.
+- The homepage keeps the blueprint visible, while a strategy detail starts with its blueprint collapsed so the strategy screenshots are immediately visible; Expand opens the map full-screen and Close collapses it again.
 - Each floor is automatically cropped around the playable layout and exported as an 800 px JPEG.
 - One finger keeps scrolling the page normally; two fingers zoom and move the blueprint up to 4x on phones. Desktop blueprints fit fully at 1x, use Ctrl/Command plus wheel to zoom, and Ctrl/Command plus drag as a hand tool.
 - Roof layers are hidden from the match-time floor selector, and the embedded desktop blueprint is height-limited while Expand retains the large view.
