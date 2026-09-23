@@ -2,6 +2,8 @@
 
 A mobile-first visual strategy playbook for Rainbow Six Siege squads. Pick a map, side, and Bomb site, check the floor blueprint, then open a compact screenshot-led strategy.
 
+**Live app:** [nuk3zz.github.io/squadbook](https://nuk3zz.github.io/squadbook/)
+
 ## Features
 
 - 29 selectable maps and 104 Bomb-site definitions
@@ -31,7 +33,7 @@ The app works locally without an account or backend. To share profiles and strat
 
 The real `dist/data/supabase-config.json` file is intentionally ignored by Git. Only the browser-safe publishable key belongs in that file—never add a Supabase secret or service-role key.
 
-After the shared connection is verified, deploy the contents of `dist/` to a static host and optionally attach a custom domain.
+Every push to `main` deploys the contents of `dist/` to GitHub Pages. A custom domain can be attached later.
 
 ## Data sources and credits
 

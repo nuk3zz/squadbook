@@ -131,3 +131,4 @@
 
 - GitHub Pages can publish the existing `dist/` directory at no hosting cost for this public repository.
 - The deployment workflow generates the ignored Supabase config from GitHub Actions secrets inside the runner, so the real values never enter Git history.
+- The live GitHub Pages build loaded all app data, reached **Shared** mode, and produced no browser warnings or errors.

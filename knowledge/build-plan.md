@@ -63,7 +63,8 @@ Optional gadget references were deliberately left out to keep the match-time too
 
 ## Stage 5 — Publish and match test
 
-- Deploy the static site through GitHub Pages, injecting the ignored Supabase browser configuration from repository secrets.
+- Status: deployed; awaiting real match testing and an optional custom domain.
+- The static site deploys through GitHub Pages, injecting the ignored Supabase browser configuration from repository secrets.
 - Test on phones and second monitors during real matches.
 - Remove any interaction that slows down map-to-strategy access.
 - Add offline caching only if the squad actually needs it.
