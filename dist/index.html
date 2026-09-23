@@ -23,6 +23,7 @@
     }
 
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
 
     body {
       margin: 0;
@@ -135,9 +136,20 @@
 
     dialog::backdrop { background: rgba(3, 5, 8, .82); backdrop-filter: blur(5px); }
 
-    .profile-form { padding: 24px; }
-    .profile-form h2 { margin-bottom: 7px; font-size: 1.55rem; }
+    .profile-shell { padding: 24px; }
+    .profile-shell h2 { margin-bottom: 7px; font-size: 1.55rem; }
     .profile-copy { margin-bottom: 22px; color: var(--muted); font-size: .9rem; }
+    .profile-mode-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+    .profile-mode-picker button.active { border-color: var(--accent); color: var(--accent); }
+    .pin-field { margin-top: 14px; }
+    .pin-help, .profile-error { margin: 7px 0 0; color: var(--muted); font-size: .78rem; }
+    .profile-error { color: #ff9893; }
+    .profile-choice-list { display: grid; gap: 8px; max-height: 280px; margin-bottom: 18px; overflow: auto; }
+    .profile-choice { display: flex; align-items: center; gap: 11px; width: 100%; border: 1px solid var(--line); border-radius: 13px; padding: 9px; background: var(--panel-2); color: var(--text); text-align: left; cursor: pointer; }
+    .profile-choice.selected { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .profile-choice:disabled { cursor: not-allowed; opacity: .48; }
+    .profile-choice .avatar { flex: 0 0 42px; width: 42px; height: 42px; }
+    .profile-choice small { display: block; margin-top: 2px; color: var(--muted); }
     .profile-photo-row { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
 
     .profile-preview {
@@ -340,6 +352,11 @@
       -webkit-user-drag: none;
     }
 
+    @media (min-width: 761px) {
+      .browse .blueprint-card:not(.expanded) .blueprint-canvas { height: min(38vh, 390px); min-height: 260px; }
+      .browse .blueprint-card:not(.expanded) .blueprint-canvas img { width: auto; max-width: 100%; height: 100%; object-fit: contain; }
+    }
+
     .blueprint-loading {
       padding: 48px 20px;
       color: var(--muted);
@@ -429,7 +446,7 @@
     .strategy-card h3 { margin-bottom: 8px; font-size: 1.45rem; }
     .strategy-card p { color: var(--muted); }
     .mini-operators { display: flex; gap: 5px; margin-top: 18px; }
-    .mini-operators img { width: 34px; height: 34px; border-radius: 8px; background: var(--accent); }
+    .mini-operators img { width: 34px; height: 34px; border-radius: 8px; background: transparent; }
 
     .card-foot {
       display: flex;
@@ -439,9 +456,27 @@
       font-size: .82rem;
     }
 
-    .byline { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+    .byline { display: flex; min-width: 0; align-items: center; flex-wrap: wrap; gap: 6px 8px; color: var(--muted); }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #725cff; }
-    .open { color: var(--accent); font-weight: 900; }
+    .author-avatar {
+      display: inline-grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      overflow: hidden;
+      border: 1px solid #46505c;
+      border-radius: 50%;
+      background: #725cff;
+      color: white;
+      font-size: .58rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-stack { display: inline-flex; padding-left: 7px; }
+    .author-stack .author-avatar { margin-left: -7px; box-shadow: 0 0 0 2px var(--panel); }
+    .credit-separator { color: #59616c; }
+    .open { flex: 0 0 auto; color: var(--accent); font-weight: 900; }
 
     .empty {
       border: 1px dashed #3b424c;
@@ -511,7 +546,16 @@
     .media-slot.small { position: relative; overflow: hidden; }
     .media-slot.small img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .media-label { position: relative; z-index: 1; border-radius: 8px; padding: 6px 8px; background: rgba(5,6,8,.78); }
-    .media-stack { display: grid; gap: 12px; }
+    .reference-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; }
+    .reference-side { display: grid; gap: 10px; align-content: start; }
+    .reference-filters { display: flex; flex-wrap: wrap; gap: 7px; }
+    .reference-filter { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; background: var(--panel-2); color: var(--muted); font-size: .75rem; font-weight: 800; cursor: pointer; }
+    .reference-filter.active { border-color: var(--accent); color: var(--accent); }
+    .reference-card { min-width: 0; }
+    .reference-card .media-slot { min-height: 150px; }
+    .reference-tag { display: inline-flex; margin: 7px 4px 0; border-radius: 999px; padding: 4px 7px; background: rgba(232,255,90,.1); color: var(--accent); font-size: .68rem; font-weight: 900; text-transform: uppercase; }
+    .reference-note { margin: 7px 4px 0; color: var(--text); font-size: .82rem; overflow-wrap: anywhere; }
+    .reference-empty { grid-column: 1 / -1; min-height: 150px; }
     .media-icon { display: block; margin-bottom: 8px; color: var(--accent); font-size: 1.5rem; }
 
     .media-slot.blueprint-slot {
@@ -568,7 +612,7 @@
       width: 52px;
       height: 52px;
       border-radius: 10px;
-      background: var(--accent);
+      background: transparent;
       object-fit: contain;
     }
 
@@ -600,6 +644,7 @@
     .strategy-form-head h2 { margin-bottom: 5px; }
     .strategy-context { margin: 0; color: var(--muted); font-size: .85rem; }
     .editor-section { margin-top: 22px; }
+    details.editor-section > summary { cursor: pointer; }
     .editor-label { display: block; margin-bottom: 9px; color: var(--muted); font-size: .72rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
 
     .operator-picker {
@@ -614,17 +659,22 @@
       background: #0d0f12;
     }
 
-    .operator-choice { border: 2px solid transparent; border-radius: 11px; padding: 3px; background: var(--panel-2); cursor: pointer; }
-    .operator-choice img { display: block; width: 100%; aspect-ratio: 1; border-radius: 8px; background: var(--accent); }
-    .operator-choice.selected { border-color: var(--accent); background: rgba(232,255,90,.12); }
+    .operator-choice { border: 2px solid transparent; border-radius: 11px; padding: 4px; background: transparent; cursor: pointer; }
+    .operator-choice img { display: block; width: 100%; aspect-ratio: 1; border-radius: 8px; background: transparent; }
+    .operator-choice:hover { background: rgba(255,255,255,.06); }
+    .operator-choice.selected { border-color: #f4f6f8; background: rgba(255,255,255,.1); }
     .operator-count { margin-top: 8px; color: var(--muted); font-size: .78rem; }
     .checkpoint-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
     .checkpoint-grid input { width: 100%; min-width: 0; }
-    .media-editor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .media-editor { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: #0d0f12; }
-    .media-preview { display: grid; place-items: center; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; background: var(--panel-2); color: var(--muted); font-size: .82rem; }
-    .media-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .media-editor-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+    .reference-editor-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .reference-editor { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: #0d0f12; }
+    .reference-dropzone { display: grid; place-items: center; aspect-ratio: 16 / 9; overflow: hidden; border: 1px dashed #4b5562; border-radius: 10px; background: var(--panel-2); color: var(--muted); font-size: .82rem; cursor: pointer; }
+    .reference-dropzone:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .reference-dropzone img { width: 100%; height: 100%; object-fit: cover; }
+    .reference-editor .profile-name-input { min-height: 42px; margin-top: 9px; }
+    .reference-label-select { width: 100%; min-height: 42px; margin-top: 9px; border: 1px solid var(--line); border-radius: 10px; padding: 0 11px; background: var(--panel-2); color: var(--text); font: inherit; }
+    .reference-editor-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+    .add-reference { width: 100%; margin-top: 10px; border-style: dashed; }
     .danger-button { border-color: #6a3333; color: #ff9893; }
     .strategy-form-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 24px; }
     .strategy-form-actions > div { display: flex; gap: 9px; }
@@ -666,11 +716,11 @@
         box-shadow: 0 8px 24px rgba(0,0,0,.28);
       }
       .media-slot { min-height: 225px; }
-      .media-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .reference-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .media-slot.small { min-height: 132px; padding: 12px; }
       .steps { grid-template-columns: repeat(2, 1fr); }
       .strategy-form { padding: 18px; }
-      .checkpoint-grid, .media-editor-grid { grid-template-columns: 1fr; }
+      .checkpoint-grid, .reference-editor-list { grid-template-columns: 1fr; }
       .operator-picker { max-height: 205px; }
       .detail-actions { align-items: flex-start; flex-direction: column; }
     }
@@ -748,19 +798,19 @@
           <p class="eyebrow" id="detail-path">Strategy</p>
           <h1 id="detail-title">Strategy</h1>
         </div>
-        <div class="detail-actions"><div class="author-pill"><span class="dot"></span><span id="detail-author">Added by player</span></div><button class="secondary-button" id="edit-strategy" type="button">Edit</button></div>
+        <div class="detail-actions"><div class="author-pill" id="detail-credit">Added by player</div><button class="secondary-button" id="edit-strategy" type="button">Edit</button></div>
       </div>
 
       <div class="media-grid">
         <div class="media-slot blueprint-slot" id="detail-blueprint-home"></div>
-        <div class="media-stack">
-          <div class="media-slot small" id="plant-media"></div>
-          <div class="media-slot small" id="post-media"></div>
+        <div class="reference-side">
+          <div class="reference-filters" id="reference-filters"></div>
+          <div class="reference-gallery" id="reference-media"></div>
         </div>
       </div>
 
       <div class="quick-grid">
-        <div class="panel">
+        <div class="panel" id="operator-panel">
           <div class="panel-title">Operator lineup</div>
           <div class="operators" id="operators"></div>
         </div>
@@ -773,24 +823,43 @@
   </main>
 
   <dialog id="profile-dialog" aria-labelledby="profile-title">
-    <form class="profile-form" id="profile-form">
+    <div class="profile-shell">
       <h2 id="profile-title">Create player profile</h2>
-      <p class="profile-copy">Name and photo only. No email, password, or verification.</p>
-      <div class="profile-photo-row">
-        <div class="profile-preview" id="profile-preview">?</div>
-        <div class="photo-actions">
-          <label class="secondary-button" for="profile-photo">Choose photo</label>
-          <input class="photo-input" id="profile-photo" type="file" accept="image/*">
-          <button class="secondary-button" id="remove-photo" type="button">Remove photo</button>
+      <p class="profile-copy" id="profile-copy">Use a 4-digit PIN to reopen your profile on another device.</p>
+      <div class="profile-mode-picker" id="profile-mode-picker">
+        <button class="secondary-button" id="restore-profile-mode" type="button">Existing player</button>
+        <button class="secondary-button" id="create-profile-mode" type="button">New player</button>
+      </div>
+      <form class="profile-form" id="profile-form">
+        <div class="profile-photo-row">
+          <div class="profile-preview" id="profile-preview">?</div>
+          <div class="photo-actions">
+            <label class="secondary-button" for="profile-photo">Choose photo</label>
+            <input class="photo-input" id="profile-photo" type="file" accept="image/*">
+            <button class="secondary-button" id="remove-photo" type="button">Remove photo</button>
+          </div>
         </div>
-      </div>
-      <label class="profile-name-label" for="profile-name">Player name</label>
-      <input class="profile-name-input" id="profile-name" name="name" maxlength="24" autocomplete="nickname" required placeholder="Your name">
-      <div class="profile-actions">
-        <button class="secondary-button" id="profile-cancel" type="button">Cancel</button>
-        <button class="primary-button" type="submit">Save profile</button>
-      </div>
-    </form>
+        <label class="profile-name-label" for="profile-name">Player name</label>
+        <input class="profile-name-input" id="profile-name" name="name" maxlength="24" autocomplete="nickname" required placeholder="Your name">
+        <div class="pin-field" id="profile-pin-field">
+          <label class="profile-name-label" id="profile-pin-label" for="profile-pin">4-digit PIN</label>
+          <input class="profile-name-input" id="profile-pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" placeholder="••••">
+          <p class="pin-help" id="profile-pin-help">Remember this PIN. It links your profile on another browser or phone.</p>
+        </div>
+        <p class="profile-error" id="profile-save-error" hidden></p>
+        <div class="profile-actions">
+          <button class="secondary-button" id="profile-cancel" type="button">Cancel</button>
+          <button class="primary-button" type="submit">Save profile</button>
+        </div>
+      </form>
+      <form id="profile-restore-form" hidden>
+        <div class="profile-choice-list" id="profile-choice-list"></div>
+        <label class="profile-name-label" for="profile-restore-pin">Your 4-digit PIN</label>
+        <input class="profile-name-input" id="profile-restore-pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" required placeholder="••••">
+        <p class="profile-error" id="profile-restore-error" hidden></p>
+        <div class="profile-actions"><button class="primary-button" type="submit">Use this profile</button></div>
+      </form>
+    </div>
   </dialog>
 
   <dialog class="strategy-dialog" id="strategy-dialog" aria-labelledby="strategy-form-title">
@@ -803,11 +872,11 @@
       <label class="profile-name-label" for="strategy-title">Strategy name</label>
       <input class="profile-name-input" id="strategy-title" maxlength="42" required placeholder="Example: Garage take">
 
-      <div class="editor-section">
-        <span class="editor-label">Operators · choose up to 5</span>
+      <details class="editor-section" id="operator-section">
+        <summary class="editor-label">Operators · optional · choose up to 5</summary>
         <div class="operator-picker" id="operator-picker"></div>
         <div class="operator-count" id="operator-count">0 / 5 selected</div>
-      </div>
+      </details>
 
       <div class="editor-section">
         <span class="editor-label">Round checkpoints · short labels</span>
@@ -821,16 +890,8 @@
 
       <div class="editor-section">
         <span class="editor-label">Visual references · optional</span>
-        <div class="media-editor-grid">
-          <div class="media-editor">
-            <div class="media-preview" id="plant-preview">Plant spot</div>
-            <div class="media-editor-actions"><label class="secondary-button" for="plant-upload">Choose image</label><input class="photo-input" id="plant-upload" type="file" accept="image/*"><button class="secondary-button" id="plant-remove" type="button">Remove</button></div>
-          </div>
-          <div class="media-editor">
-            <div class="media-preview" id="post-preview">Post-plant angle</div>
-            <div class="media-editor-actions"><label class="secondary-button" for="post-upload">Choose image</label><input class="photo-input" id="post-upload" type="file" accept="image/*"><button class="secondary-button" id="post-remove" type="button">Remove</button></div>
-          </div>
-        </div>
+        <div class="reference-editor-list" id="reference-editor-list"></div>
+        <button class="secondary-button add-reference" id="add-reference" type="button">+ Add photo reference</button>
       </div>
 
       <div class="strategy-form-actions">
@@ -848,7 +909,14 @@
 
     let sitesByMap = {};
 
-    const operatorIds = "ace alibi amaru aruni ash azami bandit blackbeard blitz brava buck capitao castle caveira clash deimos denari doc dokkaebi echo ela fenrir finka flores frost fuze glaz goyo gridlock grim hibana iana iq jackal jager kaid kali kapkan lesion lion maestro maverick melusi mira montagne mozzie mute nokk nomad oryx osa pulse ram rauora recruit_blue recruit_green recruit_orange recruit_red recruit_yellow rook sens sentry skopos sledge smoke solis striker tachanka thatcher thermite thorn thunderbird tubarao twitch valkyrie vigil wamai warden ying zero zofia".split(" ");
+    const operatorIdsBySide = {
+      attack: "ace amaru ash blackbeard blitz brava buck capitao deimos dokkaebi finka flores fuze glaz gridlock grim hibana iana iq jackal kali lion maverick montagne nokk nomad osa ram rauora sens sledge striker thatcher thermite twitch ying zero zofia".split(" "),
+      defense: "alibi aruni azami bandit castle caveira clash denari doc echo ela fenrir frost goyo jager kaid kapkan lesion maestro melusi mira mozzie mute oryx pulse rook sentry skopos smoke solis tachanka thorn thunderbird tubarao valkyrie vigil wamai warden".split(" ")
+    };
+    const referenceLabelsBySide = {
+      attack: ["Plant Spot", "Map Control", "Walls to Breach", "LOS (Line of sights)", "Drone Placements", "Vertical Play", "Other"],
+      defense: ["Rotations", "Map Control", "Walls to Hold", "LOS (Line of sights)", "Camera Placements", "Vertical Play", "Other"]
+    };
     const legacyClubSiteIds = {
       "church-arsenal": "0-4",
       "bar-stage": "1-3",
@@ -858,8 +926,10 @@
     let strategies = [];
     let activeStrategy = null;
     let selectedOperators = [];
-    let pendingPlantImage = "";
-    let pendingPostImage = "";
+    let pendingReferences = [];
+    let availableProfiles = [];
+    let selectedProfileId = "";
+    let activeReferenceFilter = "All";
     let store = null;
     let unsubscribeFromStrategies = () => {};
 
@@ -887,6 +957,10 @@
     const profilePhoto = document.querySelector("#profile-photo");
     const profilePreview = document.querySelector("#profile-preview");
     const profileCancel = document.querySelector("#profile-cancel");
+    const profilePin = document.querySelector("#profile-pin");
+    const profileRestoreForm = document.querySelector("#profile-restore-form");
+    const profileRestorePin = document.querySelector("#profile-restore-pin");
+    const referenceEditorList = document.querySelector("#reference-editor-list");
     let playerProfile = null;
     let pendingPhoto = "";
     const gesture = { scale: 1, x: 0, y: 0, startScale: 1, startX: 0, startY: 0, startDistance: 0, contentX: 0, contentY: 0 };
@@ -914,15 +988,120 @@
       renderProfilePreview(avatar, playerProfile?.name || "", playerProfile?.photo || "");
     }
 
-    function openProfileEditor() {
+    function strategyAuthorProfile(item) {
+      return availableProfiles.find(profile => profile.id === item.authorId)
+        || (playerProfile?.id === item.authorId ? playerProfile : null);
+    }
+
+    function strategyAuthorAvatar(item) {
+      const profile = strategyAuthorProfile(item);
+      return profile?.photo
+        ? `<span class="author-avatar"><img src="${escapeHtml(profile.photo)}" alt=""></span>`
+        : `<span class="author-avatar">${escapeHtml(initials(profile?.name || item.author || ""))}</span>`;
+    }
+
+    function strategyEditorProfile(item) {
+      return availableProfiles.find(profile => profile.id === item.editorId)
+        || (playerProfile?.id === item.editorId ? playerProfile : null);
+    }
+
+    function profileAvatar(profile, fallbackName) {
+      return profile?.photo
+        ? `<span class="author-avatar"><img src="${escapeHtml(profile.photo)}" alt=""></span>`
+        : `<span class="author-avatar">${escapeHtml(initials(profile?.name || fallbackName || ""))}</span>`;
+    }
+
+    function strategyCredit(item) {
+      const editorIsDifferent = item.editorId && item.editorId !== item.authorId;
+      const authorName = strategyAuthorProfile(item)?.name || item.author;
+      const editorName = strategyEditorProfile(item)?.name || item.editor || "player";
+      const avatars = [strategyAuthorAvatar(item)];
+      if (editorIsDifferent) avatars.push(profileAvatar(strategyEditorProfile(item), item.editor));
+      return `<span class="author-stack">${avatars.join("")}</span><span>Added by ${escapeHtml(authorName)}</span>${editorIsDifferent ? `<span class="credit-separator">·</span><span>Edited by ${escapeHtml(editorName)}</span>` : ""}`;
+    }
+
+    async function refreshAvailableProfiles() {
+      availableProfiles = store?.mode === "shared"
+        ? await store.listProfiles()
+        : (playerProfile ? [playerProfile] : []);
+    }
+
+    function profileErrorMessage(code) {
+      return ({
+        incorrect_pin: "That PIN is incorrect.",
+        try_later: "Too many attempts. Try again in 15 minutes.",
+        squad_full: "The five-player squad is full.",
+        invalid_pin: "Enter exactly four numbers.",
+        profile_exists: "This device already has a player profile."
+      })[code] || "Could not save the profile. Check the connection and try again.";
+    }
+
+    function renderProfileChoices() {
+      const list = document.querySelector("#profile-choice-list");
+      if (!availableProfiles.length) {
+        list.innerHTML = `<div class="empty">No player profiles yet.</div>`;
+        return;
+      }
+      list.innerHTML = availableProfiles.map(profile => `
+        <button class="profile-choice ${selectedProfileId === profile.id ? "selected" : ""}" type="button" data-profile-id="${profile.id}" ${profile.pinReady ? "" : "disabled"}>
+          <span class="avatar">${profile.photo ? `<img src="${profile.photo}" alt="">` : escapeHtml(initials(profile.name))}</span>
+          <span><strong>${escapeHtml(profile.name)}</strong><small>${profile.pinReady ? "Enter PIN to continue" : "Set a PIN on the original device first"}</small></span>
+        </button>
+      `).join("");
+    }
+
+    function setProfileMode(mode) {
+      const restoring = mode === "restore";
+      document.querySelector("#restore-profile-mode").classList.toggle("active", restoring);
+      document.querySelector("#create-profile-mode").classList.toggle("active", !restoring);
+      profileRestoreForm.hidden = !restoring;
+      profileForm.hidden = restoring;
+      document.querySelector("#profile-title").textContent = restoring ? "Choose your profile" : "Create player profile";
+      document.querySelector("#profile-copy").textContent = restoring
+        ? "Pick your player and enter the same 4-digit PIN."
+        : "Name, photo, and a 4-digit recovery PIN. No email needed.";
+      if (restoring) {
+        const firstReady = availableProfiles.find(profile => profile.pinReady);
+        selectedProfileId ||= firstReady?.id || "";
+        renderProfileChoices();
+        requestAnimationFrame(() => profileRestorePin.focus());
+      } else {
+        requestAnimationFrame(() => profileName.focus());
+      }
+    }
+
+    async function openProfileEditor() {
       const creating = !playerProfile;
       document.querySelector("#profile-title").textContent = creating ? "Create player profile" : "Edit player profile";
       profileName.value = playerProfile?.name || "";
       pendingPhoto = playerProfile?.photo || "";
+      profilePin.value = "";
+      profileRestorePin.value = "";
+      document.querySelector("#profile-save-error").hidden = true;
+      document.querySelector("#profile-restore-error").hidden = true;
       renderProfilePreview(profilePreview, profileName.value, pendingPhoto);
       profileCancel.hidden = creating;
+      const recoveryEnabled = Boolean(store?.supportsProfileRecovery);
+      document.querySelector("#profile-mode-picker").hidden = !creating || !recoveryEnabled;
+      document.querySelector("#profile-pin-field").hidden = !recoveryEnabled;
+      profilePin.required = recoveryEnabled && (creating || !playerProfile?.pinReady);
+      document.querySelector("#profile-pin-label").textContent = playerProfile?.pinReady ? "New 4-digit PIN · optional" : "4-digit PIN";
+      document.querySelector("#profile-pin-help").textContent = playerProfile?.pinReady
+        ? "Leave blank to keep the current PIN."
+        : "Remember this PIN. It links your profile on another browser or phone.";
       profileDialog.showModal();
-      requestAnimationFrame(() => profileName.focus());
+      if (creating && recoveryEnabled) {
+        availableProfiles = await store.listProfiles();
+        selectedProfileId = availableProfiles.find(profile => profile.pinReady)?.id || "";
+        setProfileMode(availableProfiles.length ? "restore" : "create");
+      } else {
+        profileRestoreForm.hidden = true;
+        profileForm.hidden = false;
+        document.querySelector("#profile-copy").textContent = recoveryEnabled
+          ? "Update your name, photo, or recovery PIN."
+          : "Name and photo only. Stored on this device.";
+        requestAnimationFrame(() => profileName.focus());
+      }
     }
 
     function compressProfilePhoto(file) {
@@ -972,19 +1151,52 @@
       });
     }
 
-    function renderEditorImage(preview, source, label) {
-      preview.replaceChildren();
-      if (!source) {
-        preview.textContent = label;
+    function newReference() {
+      return { id: crypto.randomUUID?.() || String(Date.now()), label: "Other", note: "", image: "", path: "" };
+    }
+
+    function strategyReferences(item) {
+      if (Array.isArray(item?.references)) {
+        return item.references.map(reference => ({ ...reference, label: reference.label || "Other" }));
+      }
+      return [
+        item?.media?.plant && { id: "plant", label: "Plant Spot", note: "Plant spot", image: item.media.plant, path: item.mediaPaths?.plant || "" },
+        item?.media?.post && { id: "post", label: "Other", note: "Post-plant angle", image: item.media.post, path: item.mediaPaths?.post || "" }
+      ].filter(Boolean);
+    }
+
+    function renderReferenceEditors() {
+      if (!pendingReferences.length) {
+        referenceEditorList.innerHTML = `<div class="empty">Add only the screenshots this strategy needs.</div>`;
         return;
       }
-      const image = new Image();
-      image.src = source;
-      image.alt = label;
-      preview.append(image);
+      const labels = referenceLabelsBySide[sideSelect.value] || referenceLabelsBySide.attack;
+      referenceEditorList.innerHTML = pendingReferences.map(reference => `
+        <div class="reference-editor" data-reference-id="${reference.id}">
+          <div class="reference-dropzone" tabindex="0" role="button" aria-label="Choose or paste screenshot">
+            ${reference.image ? `<img src="${reference.image}" alt="">` : `<span>Click here, or focus and press Ctrl/⌘ + V</span>`}
+          </div>
+          <input class="photo-input" type="file" accept="image/*" data-reference-upload>
+          <select class="reference-label-select" data-reference-label aria-label="Reference label">
+            ${labels.map(label => `<option value="${escapeHtml(label)}" ${reference.label === label ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
+          </select>
+          <input class="profile-name-input" type="text" maxlength="90" value="${escapeHtml(reference.note)}" placeholder="Short note, angle, or instruction" data-reference-note>
+          <div class="reference-editor-actions"><button class="secondary-button" type="button" data-reference-remove>Remove</button></div>
+        </div>
+      `).join("");
+    }
+
+    async function setReferenceImage(referenceId, file) {
+      if (!file?.type?.startsWith("image/")) return;
+      const reference = pendingReferences.find(item => item.id === referenceId);
+      if (!reference) return;
+      reference.image = await compressReferenceImage(file);
+      renderReferenceEditors();
     }
 
     function renderOperatorPicker() {
+      const operatorIds = operatorIdsBySide[sideSelect.value] || [];
+      selectedOperators = selectedOperators.filter(slug => operatorIds.includes(slug));
       operatorPicker.innerHTML = operatorIds.map(slug => `
         <button class="operator-choice ${selectedOperators.includes(slug) ? "selected" : ""}" type="button" data-operator="${slug}" title="${operatorName(slug)}" aria-label="${operatorName(slug)}" aria-pressed="${selectedOperators.includes(slug)}">
           <img src="assets/operators/${slug}.svg" alt="">
@@ -1003,7 +1215,8 @@
     function normalizeStrategies(records) {
       return records.map(strategy => ({
         ...strategy,
-        site: strategy.map === "club" ? (legacyClubSiteIds[strategy.site] || strategy.site) : strategy.site
+        site: strategy.map === "club" ? (legacyClubSiteIds[strategy.site] || strategy.site) : strategy.site,
+        references: strategyReferences(strategy)
       }));
     }
 
@@ -1035,15 +1248,14 @@
       strategyId.value = item?.id || "";
       strategyTitle.value = item?.title || "";
       selectedOperators = [...(item?.operators || [])].slice(0, 5);
-      pendingPlantImage = item?.media?.plant || "";
-      pendingPostImage = item?.media?.post || "";
+      pendingReferences = strategyReferences(item).map(reference => ({ ...reference }));
       checkpointInputs.forEach((input, index) => input.value = item?.steps?.[index] || "");
       document.querySelector("#strategy-form-title").textContent = item ? "Edit strategy" : "Add strategy";
       document.querySelector("#strategy-context").textContent = `${map.name} · ${siteLabel()} · ${sideSelect.value === "attack" ? "Attack" : "Defense"}`;
       document.querySelector("#delete-strategy").hidden = !item;
+      document.querySelector("#operator-section").open = selectedOperators.length > 0;
       renderOperatorPicker();
-      renderEditorImage(document.querySelector("#plant-preview"), pendingPlantImage, "Plant spot");
-      renderEditorImage(document.querySelector("#post-preview"), pendingPostImage, "Post-plant angle");
+      renderReferenceEditors();
       strategyDialog.showModal();
       requestAnimationFrame(() => strategyTitle.focus());
     }
@@ -1135,6 +1347,15 @@
     blueprintCanvas.addEventListener("dblclick", resetBlueprintGesture);
 
     profileButton.addEventListener("click", openProfileEditor);
+    document.querySelector("#restore-profile-mode").addEventListener("click", () => setProfileMode("restore"));
+    document.querySelector("#create-profile-mode").addEventListener("click", () => setProfileMode("create"));
+    document.querySelector("#profile-choice-list").addEventListener("click", event => {
+      const choice = event.target.closest("[data-profile-id]");
+      if (!choice || choice.disabled) return;
+      selectedProfileId = choice.dataset.profileId;
+      renderProfileChoices();
+      profileRestorePin.focus();
+    });
     profileName.addEventListener("input", () => {
       if (!pendingPhoto) renderProfilePreview(profilePreview, profileName.value, "");
     });
@@ -1156,26 +1377,56 @@
     profileForm.addEventListener("submit", async event => {
       event.preventDefault();
       const name = profileName.value.trim();
-      if (!name) return;
+      const pin = profilePin.value.trim();
+      if (!name || (profilePin.required && !/^\d{4}$/.test(pin)) || (pin && !/^\d{4}$/.test(pin))) return;
       const submitButton = profileForm.querySelector('[type="submit"]');
       submitButton.disabled = true;
       const draft = {
         id: playerProfile?.id || (crypto.randomUUID?.() || String(Date.now())),
         name,
         photo: pendingPhoto,
-        photoPath: playerProfile?.photoPath || ""
+        photoPath: playerProfile?.photoPath || "",
+        pinReady: playerProfile?.pinReady || false
       };
       try {
-        playerProfile = await store.saveProfile(draft);
+        playerProfile = await store.saveProfile(draft, pin);
         if (store.mode === "shared") {
           await store.migrateLocalStrategies(playerProfile, normalizeStrategies);
           await reloadStrategies();
         }
+        await refreshAvailableProfiles();
+        renderStrategies();
         renderPlayerProfile();
         profileDialog.close();
       } catch (error) {
         console.error(error);
-        alert("The player profile could not be saved. Check the shared connection and try again.");
+        const message = document.querySelector("#profile-save-error");
+        message.textContent = profileErrorMessage(error.code || error.message);
+        message.hidden = false;
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    profileRestoreForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const pin = profileRestorePin.value.trim();
+      if (!selectedProfileId || !/^\d{4}$/.test(pin)) return;
+      const submitButton = profileRestoreForm.querySelector('[type="submit"]');
+      const message = document.querySelector("#profile-restore-error");
+      submitButton.disabled = true;
+      message.hidden = true;
+      try {
+        playerProfile = await store.claimProfile(selectedProfileId, pin);
+        await reloadStrategies();
+        await refreshAvailableProfiles();
+        renderStrategies();
+        renderPlayerProfile();
+        profileDialog.close();
+      } catch (error) {
+        console.error(error);
+        message.textContent = profileErrorMessage(error.code || error.message);
+        message.hidden = false;
       } finally {
         submitButton.disabled = false;
       }
@@ -1197,27 +1448,49 @@
       renderOperatorPicker();
     });
 
-    document.querySelector("#plant-upload").addEventListener("change", async event => {
-      const file = event.currentTarget.files?.[0];
-      if (!file) return;
-      pendingPlantImage = await compressReferenceImage(file);
-      renderEditorImage(document.querySelector("#plant-preview"), pendingPlantImage, "Plant spot");
-      event.currentTarget.value = "";
+    document.querySelector("#add-reference").addEventListener("click", () => {
+      const reference = newReference();
+      pendingReferences.push(reference);
+      renderReferenceEditors();
+      requestAnimationFrame(() => referenceEditorList.querySelector(`[data-reference-id="${reference.id}"] .reference-dropzone`)?.focus());
     });
-    document.querySelector("#post-upload").addEventListener("change", async event => {
-      const file = event.currentTarget.files?.[0];
-      if (!file) return;
-      pendingPostImage = await compressReferenceImage(file);
-      renderEditorImage(document.querySelector("#post-preview"), pendingPostImage, "Post-plant angle");
-      event.currentTarget.value = "";
+    referenceEditorList.addEventListener("click", event => {
+      const card = event.target.closest("[data-reference-id]");
+      if (!card) return;
+      const referenceId = card.dataset.referenceId;
+      if (event.target.closest("[data-reference-remove]")) {
+        pendingReferences = pendingReferences.filter(reference => reference.id !== referenceId);
+        renderReferenceEditors();
+        return;
+      }
+      if (event.target.closest(".reference-dropzone")) {
+        card.querySelector("[data-reference-upload]").click();
+      }
     });
-    document.querySelector("#plant-remove").addEventListener("click", () => {
-      pendingPlantImage = "";
-      renderEditorImage(document.querySelector("#plant-preview"), "", "Plant spot");
+    referenceEditorList.addEventListener("input", event => {
+      if (!event.target.matches("[data-reference-note]")) return;
+      const reference = pendingReferences.find(item => item.id === event.target.closest("[data-reference-id]").dataset.referenceId);
+      if (reference) reference.note = event.target.value;
     });
-    document.querySelector("#post-remove").addEventListener("click", () => {
-      pendingPostImage = "";
-      renderEditorImage(document.querySelector("#post-preview"), "", "Post-plant angle");
+    referenceEditorList.addEventListener("change", async event => {
+      const card = event.target.closest("[data-reference-id]");
+      if (!card) return;
+      if (event.target.matches("[data-reference-label]")) {
+        const reference = pendingReferences.find(item => item.id === card.dataset.referenceId);
+        if (reference) reference.label = event.target.value;
+        return;
+      }
+      if (event.target.matches("[data-reference-upload]")) {
+        await setReferenceImage(card.dataset.referenceId, event.target.files?.[0]);
+      }
+    });
+    referenceEditorList.addEventListener("paste", async event => {
+      const card = event.target.closest("[data-reference-id]");
+      if (!card) return;
+      const imageItem = [...(event.clipboardData?.items || [])].find(item => item.kind === "file" && item.type.startsWith("image/"));
+      if (!imageItem) return;
+      event.preventDefault();
+      await setReferenceImage(card.dataset.referenceId, imageItem.getAsFile());
     });
 
     strategyForm.addEventListener("submit", async event => {
@@ -1233,10 +1506,12 @@
         title: strategyTitle.value.trim(),
         author: existing?.author || playerProfile.name,
         authorId: existing?.authorId || playerProfile.id,
+        editor: existing ? playerProfile.name : "",
+        editorId: existing ? playerProfile.id : "",
         operators: [...selectedOperators],
         steps: checkpointInputs.map(input => input.value.trim()).filter(Boolean),
-        media: { plant: pendingPlantImage, post: pendingPostImage },
-        mediaPaths: existing?.mediaPaths || { plant: "", post: "" },
+        references: pendingReferences.filter(reference => reference.image).map(reference => ({ ...reference, label: reference.label || "Other", note: reference.note.trim() })),
+        previousReferences: strategyReferences(existing),
         createdAt: existing?.createdAt || Date.now(),
         updatedAt: Date.now()
       };
@@ -1286,7 +1561,6 @@
     }
 
     function floorLabel(map, floor) {
-      if (floor === map.maxFloorNumber) return "Roof";
       if (floor === -1) return "SB";
       if (floor === 0) return "B";
       return `${floor}F`;
@@ -1303,7 +1577,7 @@
       const map = currentMap();
       if (!map) return;
       const floorOptions = [];
-      for (let floor = map.minFloorNumber; floor <= map.maxFloorNumber; floor += 1) {
+      for (let floor = map.minFloorNumber; floor < map.maxFloorNumber; floor += 1) {
         floorOptions.push(`<option value="${floor}">${floorLabel(map, floor)}</option>`);
       }
       floorSelect.innerHTML = floorOptions.join("");
@@ -1367,7 +1641,7 @@
           <h3>${escapeHtml(item.title)}</h3>
           <span class="mini-operators">${item.operators.slice(0, 5).map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}</span>
           <span class="card-foot">
-            <span class="byline"><span class="dot"></span>Added by ${escapeHtml(item.author)}</span>
+            <span class="byline">${strategyCredit(item)}</span>
             <span class="open">OPEN →</span>
           </span>
         </button>
@@ -1387,18 +1661,32 @@
       return String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character]);
     }
 
-    function renderStrategyMedia(container, source, label, icon) {
-      container.replaceChildren();
-      if (source) {
-        const image = new Image();
-        image.src = source;
-        image.alt = label;
-        container.append(image);
+    function renderStrategyReferences(item) {
+      const container = document.querySelector("#reference-media");
+      const filters = document.querySelector("#reference-filters");
+      const references = strategyReferences(item);
+      if (!references.length) {
+        filters.replaceChildren();
+        container.innerHTML = `<div class="media-slot reference-empty"><span class="media-label">No extra references</span></div>`;
+        return;
       }
-      const caption = document.createElement("div");
-      caption.className = "media-label";
-      caption.textContent = `${icon} ${label}`;
-      container.append(caption);
+      const configuredLabels = referenceLabelsBySide[item.side] || referenceLabelsBySide.attack;
+      const usedLabels = [...new Set(references.map(reference => reference.label || "Other"))];
+      const orderedLabels = configuredLabels.filter(label => usedLabels.includes(label)).concat(usedLabels.filter(label => !configuredLabels.includes(label)));
+      if (activeReferenceFilter !== "All" && !usedLabels.includes(activeReferenceFilter)) activeReferenceFilter = "All";
+      filters.innerHTML = ["All", ...orderedLabels].map(label => `
+        <button class="reference-filter ${activeReferenceFilter === label ? "active" : ""}" type="button" data-reference-filter="${escapeHtml(label)}">${escapeHtml(label)}</button>
+      `).join("");
+      const visibleReferences = activeReferenceFilter === "All"
+        ? references
+        : references.filter(reference => reference.label === activeReferenceFilter);
+      container.innerHTML = visibleReferences.map((reference, index) => `
+        <div class="reference-card">
+          <div class="media-slot small"><img src="${reference.image}" alt="Reference ${index + 1}"><span class="media-label">Reference ${index + 1}</span></div>
+          <span class="reference-tag">${escapeHtml(reference.label || "Other")}</span>
+          ${reference.note ? `<p class="reference-note">${escapeHtml(reference.note)}</p>` : ""}
+        </div>
+      `).join("");
     }
 
     function openStrategy(item) {
@@ -1408,15 +1696,16 @@
       const sideLabel = sideSelect.value === "attack" ? "Attack" : "Defense";
       document.querySelector("#detail-path").textContent = `${map.name} · ${siteLabel()} · ${sideLabel}`;
       document.querySelector("#detail-title").textContent = item.title;
-      document.querySelector("#detail-author").textContent = `Added by ${item.author}`;
+      document.querySelector("#detail-credit").innerHTML = strategyCredit(item);
+      document.querySelector("#operator-panel").hidden = !item.operators.length;
       document.querySelector("#operators").innerHTML = item.operators.map(slug => `
         <span class="operator-slot"><img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}"></span>
       `).join("");
       document.querySelector("#steps").innerHTML = item.steps.map((step, index) => `
         <li><b>0${index + 1}</b>${escapeHtml(step)}</li>
       `).join("");
-      renderStrategyMedia(document.querySelector("#plant-media"), item.media?.plant, "Plant spot", "⌖");
-      renderStrategyMedia(document.querySelector("#post-media"), item.media?.post, "Post-plant angle", "◫");
+      activeReferenceFilter = "All";
+      renderStrategyReferences(item);
       document.querySelector("#detail-blueprint-home").append(blueprintCard);
       browse.classList.add("hidden");
       detail.classList.add("active");
@@ -1428,6 +1717,13 @@
       detail.classList.remove("active");
       browse.classList.remove("hidden");
       activeStrategy = null;
+    });
+
+    document.querySelector("#reference-filters").addEventListener("click", event => {
+      const button = event.target.closest("[data-reference-filter]");
+      if (!button || !activeStrategy) return;
+      activeReferenceFilter = button.dataset.referenceFilter;
+      renderStrategyReferences(activeStrategy);
     });
 
     document.querySelector("#blueprint-expand").addEventListener("click", event => {
@@ -1474,6 +1770,7 @@
           await store.migrateLocalStrategies(playerProfile, normalizeStrategies);
           strategies = normalizeStrategies(await store.loadStrategies());
         }
+        await refreshAvailableProfiles();
       } catch (error) {
         console.error(error);
         playerProfile = null;
@@ -1499,7 +1796,7 @@
           unsubscribeFromStrategies();
           unsubscribeFromStrategies = store.subscribe(() => reloadStrategies().catch(console.error));
         }
-        if (!playerProfile?.name) openProfileEditor();
+        if (!playerProfile?.name || (store.supportsProfileRecovery && !playerProfile.pinReady)) openProfileEditor();
       } catch (error) {
         console.error(error);
         list.innerHTML = `<div class="empty">Map data could not be loaded.</div>`;

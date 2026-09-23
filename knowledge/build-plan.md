@@ -27,10 +27,10 @@ Status: complete.
 - Completed visual foundation: 29 selectable maps, an automated compact blueprint exporter, and 81 locally stored operator icons.
 - Completed lightweight identity: each device creates a name-and-photo player profile with no email, password, or verification; tapping the header profile edits it.
 - Removed prototype player names and strategies so real squad content starts clean.
-- Completed strategy editor: add/edit/delete local strategies, select up to five operator icons, enter four short checkpoints, and attach plant/post-plant images.
+- Completed strategy editor: add/edit/delete strategies, optionally select up to five side-specific operator icons, enter four short checkpoints, and attach any number of generic photo-and-note references.
 - Completed bomb-site catalog: 104 selectable sites across the 27 maps whose source blueprints contain Bomb objectives; arcade-only Close Quarters and District correctly show no Bomb sites.
 - Bomb-site IDs are stable across callout-name changes, and the four earlier Clubhouse IDs migrate when old local strategies are loaded.
-- Completed author attribution through the active lightweight player profile.
+- Completed creator and latest-editor attribution through stable player profiles, including compact overlapping photo-or-initials avatars and both names when different players contribute.
 - Completed local browser persistence while the editor is tested.
 
 Optional gadget references were deliberately left out to keep the match-time tool visual and lightweight. They can be added later only if the squad finds a real need for them.
@@ -40,13 +40,16 @@ Optional gadget references were deliberately left out to keep the match-time too
 - A selected floor blueprint appears above the strategy list and is carried into the opened strategy.
 - Each floor is automatically cropped around the playable layout and exported as an 800 px JPEG.
 - One finger keeps scrolling the page normally; two fingers zoom and move the blueprint up to 4x on phones.
-- Strategy operator recommendations use icons as the primary language; names remain available as accessibility labels and hover titles.
+- Roof layers are hidden from the match-time floor selector, and the embedded desktop blueprint is height-limited while Expand retains the large view.
+- Strategy operator recommendations use plain icons as the primary language; Attack and Defense show only their corresponding roster, and names remain available as accessibility labels and hover titles.
+- Every visual reference is a screenshot plus optional short note and a side-specific tactical label. The strategy view shows only labels actually used and can filter the gallery without changing the saved order. Desktop users can choose a file or paste a screenshot with Ctrl/Command+V.
 - Huge source SVGs are used only during export and immediately discarded; the runtime serves compact local JPEGs with no internet dependency.
 
 ## Stage 3 — Shared squad version
 
 - Status: complete and connected to the squad's Supabase project.
 - Added anonymous session support with no email, password, or verification step.
+- Added four-digit PIN recovery so the same player profile can be linked on another browser or phone, with a five-player roster cap and failed-attempt cooldown.
 - Added shared player profiles, strategies, private image paths, and realtime strategy refresh.
 - Added automatic one-time migration of the current browser's local profile and strategies.
 - Added a visible `Local only`, `Shared`, or `Local fallback` connection state.

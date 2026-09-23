@@ -132,3 +132,15 @@
 - GitHub Pages can publish the existing `dist/` directory at no hosting cost for this public repository.
 - The deployment workflow generates the ignored Supabase config from GitHub Actions secrets inside the runner, so the real values never enter Git history.
 - The live GitHub Pages build loaded all app data, reached **Shared** mode, and produced no browser warnings or errors.
+
+## 2026-09-24 — PIN recovery and flexible references
+
+- A stable player profile can remain separate from browser-bound anonymous auth by linking each anonymous user UUID through a small device-to-profile table.
+- Four-digit PINs stay server-side as bcrypt hashes; five failures pause claims for 15 minutes, and profile creation is capped at five.
+- Existing anonymous profiles need a one-time PIN setup on their original browser, after which other devices can claim the same profile.
+- Strategy references work better as an ordered list of compressed screenshots and optional notes than fixed plant/post-plant slots.
+- Side-specific labels keep a large reference gallery scannable: Attack and Defense use different tactical taxonomies, and the detail view only shows filter chips for labels present in that strategy.
+- Strategy author avatars should resolve by stable profile ID rather than display name, so renamed players and duplicate-looking names still show the correct photo.
+- Creator and latest-editor identity need separate fields: updating the author fields would erase authorship, while an optional editor pair supports compact overlapping avatars and both names.
+- A focusable image box can support both ordinary file selection and direct screenshot paste without adding another dependency.
+- Attack/Defense operator filtering and removing colored icon backgrounds make the optional picker much faster to scan.

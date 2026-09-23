@@ -7,10 +7,12 @@ A mobile-first visual strategy playbook for Rainbow Six Siege squads. Pick a map
 ## Features
 
 - 29 selectable maps and 104 Bomb-site definitions
-- Compact floor blueprints and familiar operator icons
+- Compact floor blueprints and side-specific operator icons
 - Mobile pinch-to-zoom and desktop Ctrl/Command-wheel blueprint zoom
 - Lightweight player profiles with no email or verification code
-- Screenshot-focused strategy editing with compressed uploads
+- Unlimited labeled screenshot-and-note references with gallery filters, file upload, or clipboard paste
+- Creator and latest-editor profile attribution with compact avatars
+- Four-digit profile recovery across browsers and devices
 - Optional Supabase sharing, private media storage, and realtime refresh
 
 Squadbook uses plain HTML, CSS, and JavaScript with no build step.

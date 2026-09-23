@@ -25,9 +25,16 @@
   function createLocalStore() {
     return {
       mode: "local",
+      supportsProfileRecovery: false,
       async initialize() {},
       async loadProfile() {
         return readJson(profileStorageKey, null);
+      },
+      async listProfiles() {
+        return [];
+      },
+      async claimProfile() {
+        throw new Error("Profile recovery requires shared mode.");
       },
       async saveProfile(profile) {
         localStorage.setItem(profileStorageKey, JSON.stringify(profile));
@@ -60,6 +67,7 @@
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
     });
     let user = null;
+    let activeProfileId = "";
 
     async function signedUrl(bucket, path) {
       if (!path) return "";
@@ -85,11 +93,30 @@
       if (error && !/not found/i.test(error.message || "")) throw error;
     }
 
+    async function rowToProfile(row) {
+      if (!row) return null;
+      return {
+        id: row.id,
+        name: row.display_name,
+        photo: await signedUrl("avatars", row.avatar_path),
+        photoPath: row.avatar_path || "",
+        pinReady: Boolean(row.pin_ready)
+      };
+    }
+
     async function rowToStrategy(row) {
-      const [plant, post] = await Promise.all([
-        signedUrl("strategy-media", row.plant_image_path),
-        signedUrl("strategy-media", row.post_image_path)
-      ]);
+      const storedReferences = Array.isArray(row.visual_references) ? row.visual_references : [];
+      const legacyReferences = storedReferences.length ? [] : [
+        row.plant_image_path && { id: "plant", label: "Plant Spot", note: "Plant spot", path: row.plant_image_path },
+        row.post_image_path && { id: "post", label: "Other", note: "Post-plant angle", path: row.post_image_path }
+      ].filter(Boolean);
+      const references = await Promise.all([...storedReferences, ...legacyReferences].map(async reference => ({
+        id: reference.id,
+        label: reference.label || "Other",
+        note: reference.note || "",
+        path: reference.path,
+        image: await signedUrl("strategy-media", reference.path)
+      })));
       return {
         id: row.id,
         map: row.map_id,
@@ -99,26 +126,27 @@
         title: row.title,
         author: row.author_name,
         authorId: row.author_id,
+        editor: row.editor_name || "",
+        editorId: row.editor_id || "",
         operators: row.operators || [],
         steps: row.checkpoints || [],
-        media: { plant, post },
-        mediaPaths: { plant: row.plant_image_path || "", post: row.post_image_path || "" },
+        references,
         createdAt: Date.parse(row.created_at),
         updatedAt: Date.parse(row.updated_at)
       };
     }
 
     async function saveStrategyRecord(record) {
-      const priorPaths = record.mediaPaths || {};
-      const plantPath = record.media?.plant
-        ? await uploadDataUri("strategy-media", `${record.id}/plant.jpg`, record.media.plant)
-        : "";
-      const postPath = record.media?.post
-        ? await uploadDataUri("strategy-media", `${record.id}/post.jpg`, record.media.post)
-        : "";
-
-      if (!record.media?.plant && priorPaths.plant) await removeIfPresent("strategy-media", priorPaths.plant);
-      if (!record.media?.post && priorPaths.post) await removeIfPresent("strategy-media", priorPaths.post);
+      const priorPaths = new Set((record.previousReferences || []).map(reference => reference.path).filter(Boolean));
+      const storedReferences = [];
+      for (const reference of record.references || []) {
+        if (!reference.image) continue;
+        const path = reference.path || `${record.id}/references/${reference.id}.jpg`;
+        await uploadDataUri("strategy-media", path, reference.image);
+        storedReferences.push({ id: reference.id, label: reference.label || "Other", note: reference.note || "", path });
+        priorPaths.delete(path);
+      }
+      await Promise.all([...priorPaths].map(path => removeIfPresent("strategy-media", path)));
 
       const payload = {
         id: record.id,
@@ -129,10 +157,13 @@
         title: record.title,
         author_id: record.authorId,
         author_name: record.author,
+        editor_id: record.editorId || null,
+        editor_name: record.editor || null,
         operators: record.operators.slice(0, 5),
         checkpoints: record.steps.slice(0, 4),
-        plant_image_path: plantPath || null,
-        post_image_path: postPath || null
+        visual_references: storedReferences,
+        plant_image_path: null,
+        post_image_path: null
       };
       const { data, error } = await client.from("strategies").upsert(payload).select().single();
       if (error) throw error;
@@ -141,7 +172,9 @@
 
     return {
       mode: "shared",
+      supportsProfileRecovery: true,
       get userId() { return user?.id || ""; },
+      get profileId() { return activeProfileId; },
       async initialize() {
         const { data: sessionData, error: sessionError } = await client.auth.getSession();
         if (sessionError) throw sessionError;
@@ -153,34 +186,63 @@
         }
       },
       async loadProfile() {
-        const { data, error } = await client.from("profiles").select("id, display_name, avatar_path").eq("id", user.id).maybeSingle();
+        const { data, error } = await client.rpc("get_my_profile").maybeSingle();
         if (error) throw error;
-        if (data) {
-          return {
-            id: data.id,
-            name: data.display_name,
-            photo: await signedUrl("avatars", data.avatar_path),
-            photoPath: data.avatar_path || ""
-          };
-        }
-        const localProfile = readJson(profileStorageKey, null);
-        if (!localProfile?.name) return null;
-        return this.saveProfile({ ...localProfile, id: user.id });
+        const profile = await rowToProfile(data);
+        activeProfileId = profile?.id || "";
+        if (profile) localStorage.setItem(profileStorageKey, JSON.stringify({ id: profile.id, name: profile.name, photo: "" }));
+        return profile;
       },
-      async saveProfile(profile) {
+      async listProfiles() {
+        const { data, error } = await client.rpc("list_player_profiles");
+        if (error) throw error;
+        return Promise.all((data || []).map(rowToProfile));
+      },
+      async claimProfile(profileId, pin) {
+        const { data, error } = await client.rpc("claim_player_profile", {
+          p_profile_id: profileId,
+          p_pin: pin
+        });
+        if (error) throw error;
+        if (!data?.ok) {
+          const failure = new Error(data?.error || "incorrect_pin");
+          failure.code = data?.error || "incorrect_pin";
+          throw failure;
+        }
+        return this.loadProfile();
+      },
+      async saveProfile(profile, pin = "") {
+        const creating = !activeProfileId;
+        if (creating) {
+          const { data, error } = await client.rpc("create_player_profile", {
+            p_display_name: profile.name,
+            p_pin: pin
+          });
+          if (error) throw error;
+          if (!data?.ok) {
+            const failure = new Error(data?.error || "profile_create_failed");
+            failure.code = data?.error || "profile_create_failed";
+            throw failure;
+          }
+          activeProfileId = data.id;
+        } else if (pin) {
+          const { data, error } = await client.rpc("set_my_profile_pin", { p_pin: pin });
+          if (error) throw error;
+          if (!data) throw new Error("pin_update_failed");
+        }
+
         const avatarPath = profile.photo
-          ? await uploadDataUri("avatars", `${user.id}/avatar.jpg`, profile.photo)
+          ? await uploadDataUri("avatars", `${activeProfileId}/avatar.jpg`, profile.photo)
           : "";
         if (!profile.photo && profile.photoPath) await removeIfPresent("avatars", profile.photoPath);
-        const payload = { id: user.id, display_name: profile.name, avatar_path: avatarPath || null };
-        const { data, error } = await client.from("profiles").upsert(payload).select().single();
+        const { data, error } = await client
+          .from("profiles")
+          .update({ display_name: profile.name, avatar_path: avatarPath || null })
+          .eq("id", activeProfileId)
+          .select("id, display_name, avatar_path")
+          .single();
         if (error) throw error;
-        const saved = {
-          id: data.id,
-          name: data.display_name,
-          photo: await signedUrl("avatars", data.avatar_path),
-          photoPath: data.avatar_path || ""
-        };
+        const saved = await rowToProfile({ ...data, pin_ready: creating || Boolean(pin) || profile.pinReady });
         localStorage.setItem(profileStorageKey, JSON.stringify({ id: saved.id, name: saved.name, photo: "" }));
         return saved;
       },
@@ -202,7 +264,7 @@
         let imported = 0;
         for (const record of localRecords) {
           if (remoteIds.has(record.id)) continue;
-          await saveStrategyRecord({ ...record, author: profile.name, authorId: user.id });
+          await saveStrategyRecord({ ...record, author: profile.name, authorId: profile.id });
           imported += 1;
         }
         localStorage.setItem(marker, String(imported));
@@ -212,10 +274,7 @@
       async deleteStrategy(record) {
         const { error } = await client.from("strategies").delete().eq("id", record.id);
         if (error) throw error;
-        await Promise.all([
-          removeIfPresent("strategy-media", record.mediaPaths?.plant),
-          removeIfPresent("strategy-media", record.mediaPaths?.post)
-        ]);
+        await Promise.all((record.references || []).map(reference => removeIfPresent("strategy-media", reference.path)));
       },
       subscribe(onChange) {
         let timer = 0;
