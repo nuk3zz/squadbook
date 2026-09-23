@@ -1742,7 +1742,7 @@
         : references.filter(reference => reference.label === activeReferenceFilter);
       container.innerHTML = visibleReferences.map((reference, index) => `
         <div class="reference-card">
-          <div class="media-slot small"><img src="${reference.image}" alt="Reference ${index + 1}"><span class="media-label">Reference ${index + 1}</span></div>
+          <div class="media-slot small"><img src="${reference.image}" alt="${escapeHtml(reference.label || "Strategy reference")} ${index + 1}"></div>
           <span class="reference-tag">${escapeHtml(reference.label || "Other")}</span>
           ${reference.note ? `<p class="reference-note">${escapeHtml(reference.note)}</p>` : ""}
         </div>
