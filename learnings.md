@@ -155,3 +155,9 @@
 - A focusable image box can support both ordinary file selection and direct screenshot paste without adding another dependency.
 - Attack/Defense operator filtering and removing colored icon backgrounds make the optional picker much faster to scan.
 - Mobile image capture should use a separate `accept="image/*" capture="environment"` file input. Keeping it separate from the ordinary input lets users explicitly choose Camera or Gallery, while the same compression and upload path handles both.
+
+## 2026-09-24 — Visual map picker
+
+- Twenty-nine map cards should not become a long mobile page. A two-row, horizontal CSS grid keeps every map visually selectable in a compact area.
+- Existing 800 px blueprint JPEGs also work as lightweight map thumbnails, avoiding another image set and additional storage.
+- Route thumbnail clicks and dropdown changes through one map-selection function so map, floor, site, blueprint, and strategy results cannot drift apart.

@@ -231,6 +231,41 @@
       font-size: 1rem;
     }
 
+    .map-picker { margin-bottom: 12px; }
+    .map-picker-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 4px 8px; }
+    .map-picker-head strong { font-size: .75rem; letter-spacing: .11em; text-transform: uppercase; }
+    .map-picker-head span { color: var(--muted); font-size: .7rem; }
+    .map-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-template-rows: repeat(2, 92px);
+      grid-auto-columns: 150px;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 2px 2px 9px;
+      scroll-snap-type: x proximity;
+      scrollbar-color: #46505c transparent;
+    }
+    .map-card {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      scroll-snap-align: start;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0;
+      background: var(--panel-2);
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+    }
+    .map-card::after { content: ""; position: absolute; inset: 35% 0 0; background: linear-gradient(transparent, rgba(5, 7, 9, .92)); pointer-events: none; }
+    .map-card img { width: 100%; height: 100%; object-fit: cover; opacity: .78; transition: transform .16s ease, opacity .16s ease; }
+    .map-card span { position: absolute; z-index: 1; right: 9px; bottom: 8px; left: 9px; overflow: hidden; font-size: .74rem; font-weight: 900; line-height: 1.05; text-overflow: ellipsis; text-shadow: 0 1px 4px #000; white-space: nowrap; }
+    .map-card:hover img { transform: scale(1.035); opacity: .92; }
+    .map-card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(220, 255, 69, .22); }
+    .map-card[aria-pressed="true"] span { color: var(--accent); }
+
     .selector {
       display: grid;
       grid-template-columns: 1.1fr .7fr .7fr 1.2fr;
@@ -714,6 +749,10 @@
       .mark { width: 32px; height: 32px; border-radius: 9px; }
       .browse h1 { font-size: 2.45rem; }
       .subhead { display: none; }
+      .map-picker { margin-top: 18px; }
+      .map-grid { grid-template-rows: repeat(2, 76px); grid-auto-columns: 116px; gap: 7px; }
+      .map-card { border-radius: 11px; }
+      .map-card span { right: 7px; bottom: 6px; left: 7px; font-size: .68rem; }
       .selector {
         grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
         gap: 9px;
@@ -773,6 +812,11 @@
       <p class="eyebrow">Match playbook</p>
       <h1>Pick the round.<br>Recall the plan.</h1>
       <p class="subhead">Pick the round. Read the blueprint. Run the strat.</p>
+
+      <section class="map-picker" aria-labelledby="map-picker-title">
+        <div class="map-picker-head"><strong id="map-picker-title">Choose map</strong><span>Swipe for more</span></div>
+        <div class="map-grid" id="map-grid"></div>
+      </section>
 
       <div class="selector">
         <div class="field">
@@ -965,6 +1009,7 @@
     let unsubscribeFromStrategies = () => {};
 
     const mapSelect = document.querySelector("#map");
+    const mapGrid = document.querySelector("#map-grid");
     const sideSelect = document.querySelector("#side");
     const floorSelect = document.querySelector("#floor");
     const siteSelect = document.querySelector("#site");
@@ -1677,9 +1722,39 @@
       return `${floor}F`;
     }
 
+    function mapThumbnailFloor(map) {
+      return Math.max(map.minFloorNumber, map.maxFloorNumber - 1);
+    }
+
+    function syncMapPickerSelection() {
+      mapGrid.querySelectorAll("[data-map-id]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.mapId === mapSelect.value));
+      });
+    }
+
+    function renderMapPicker() {
+      mapGrid.innerHTML = maps.map(map => `
+        <button class="map-card" type="button" data-map-id="${map.id}" aria-label="Choose ${escapeHtml(map.name)}" aria-pressed="${map.id === mapSelect.value}">
+          <img src="assets/blueprints/${map.id}/${mapThumbnailFloor(map)}.jpg" alt="" loading="lazy" decoding="async">
+          <span>${escapeHtml(map.name)}</span>
+        </button>
+      `).join("");
+    }
+
+    function selectMap(mapId) {
+      if (!maps.some(map => map.id === mapId)) return;
+      mapSelect.value = mapId;
+      syncMapPickerSelection();
+      populateFloors();
+      populateSites();
+      renderBlueprint();
+      renderStrategies();
+    }
+
     function populateMaps() {
       mapSelect.innerHTML = maps.map(map => `<option value="${map.id}">${map.name}</option>`).join("");
       mapSelect.value = maps.some(map => map.id === "club") ? "club" : maps[0]?.id;
+      renderMapPicker();
       populateFloors();
       populateSites();
     }
@@ -1879,12 +1954,11 @@
       document.body.style.overflow = expanded ? "hidden" : "";
     });
 
-    mapSelect.addEventListener("change", () => {
-      populateFloors();
-      populateSites();
-      renderBlueprint();
-      renderStrategies();
+    mapGrid.addEventListener("click", event => {
+      const button = event.target.closest("[data-map-id]");
+      if (button) selectMap(button.dataset.mapId);
     });
+    mapSelect.addEventListener("change", () => selectMap(mapSelect.value));
     floorSelect.addEventListener("change", renderBlueprint);
     siteSelect.addEventListener("change", () => {
       syncFloorToSite();

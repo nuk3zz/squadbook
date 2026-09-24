@@ -25,6 +25,7 @@ Status: complete.
 - Status: complete.
 - Completed first: mobile-first layout refinement and a Mac Mini LAN trial server.
 - Completed visual foundation: 29 selectable maps, an automated compact blueprint exporter, and 81 locally stored operator icons.
+- Added a compact two-row photo picker for all maps on the homepage. It scrolls horizontally on phones and stays synchronized with the existing map dropdown.
 - Completed lightweight identity: each device creates a name-and-photo player profile with no email, password, or verification; tapping the header profile edits it.
 - Removed prototype player names and strategies so real squad content starts clean.
 - Completed strategy editor: add/edit/delete strategies, optionally select any number of side-specific operator icons including ban backups, enter four short checkpoints, and attach any number of generic photo-and-note references.
