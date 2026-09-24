@@ -6,7 +6,7 @@ A mobile-first visual strategy playbook for Rainbow Six Siege squads. Pick a map
 
 ## Features
 
-- 29 selectable maps and 104 Bomb-site definitions
+- 26 squad-approved maps and their Bomb-site definitions
 - Compact floor blueprints and side-specific operator icons
 - Mobile pinch-to-zoom and desktop Ctrl/Command-wheel blueprint zoom
 - Lightweight player profiles with no email or verification code
@@ -14,6 +14,7 @@ A mobile-first visual strategy playbook for Rainbow Six Siege squads. Pick a map
 - Creator and latest-editor profile attribution with compact avatars
 - Four-digit profile recovery across browsers and devices
 - Optional Supabase sharing, private media storage, and realtime refresh
+- Installable iPhone/Android PWA with a standalone layout and lightweight offline shell
 
 Squadbook uses plain HTML, CSS, and JavaScript with no build step.
 
@@ -28,6 +29,10 @@ python3 -m http.server 4173 --directory dist
 ```
 
 Open `http://127.0.0.1:4173` on the same computer. To use another device on the same local network, run `start-local.command` and open the address it prints. Do not expose or forward port 4173 on your router.
+
+## Install on iPhone
+
+Open the live app in Safari, tap **Share**, choose **Add to Home Screen**, keep **Open as Web App** enabled, then tap **Add**. Squadbook will launch from its own icon without normal Safari controls.
 
 ## Shared squad mode
 

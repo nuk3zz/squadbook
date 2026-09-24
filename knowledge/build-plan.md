@@ -24,8 +24,8 @@ Status: complete.
 
 - Status: complete.
 - Completed first: mobile-first layout refinement and a Mac Mini LAN trial server.
-- Completed visual foundation: 29 selectable maps, an automated compact blueprint exporter, and 81 locally stored operator icons.
-- Added a compact two-row photo picker for all maps on the homepage. It scrolls horizontally on phones and stays synchronized with the existing map dropdown.
+- Completed visual foundation: 26 squad-approved selectable maps, an automated compact blueprint exporter, and 81 locally stored operator icons. Bartlett University, Close Quarters, and District are intentionally excluded from the app.
+- Added a compact two-row photo picker for all supported maps on the homepage. It scrolls horizontally on phones and stays synchronized with the existing map dropdown.
 - Completed lightweight identity: each device creates a name-and-photo player profile with no email, password, or verification; tapping the header profile edits it.
 - Removed prototype player names and strategies so real squad content starts clean.
 - Completed strategy editor: add/edit/delete strategies, optionally select any number of side-specific operator icons including ban backups, enter four short checkpoints, and attach any number of generic photo-and-note references.
@@ -71,6 +71,8 @@ Optional gadget references were deliberately left out to keep the match-time too
 
 - Status: deployed; awaiting real match testing and an optional custom domain.
 - The static site deploys through GitHub Pages, injecting the ignored Supabase browser configuration from repository secrets.
+- The site includes a manifest, iPhone touch icon, standalone display metadata, and a same-origin service worker so it can be installed from Safari as a PWA.
+- Offline caching covers the app shell and static assets as they are used; the live Supabase configuration and remote shared data are deliberately never intercepted.
 - Test on phones and second monitors during real matches.
 - Remove any interaction that slows down map-to-strategy access.
 - Add offline caching only if the squad actually needs it.

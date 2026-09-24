@@ -158,6 +158,15 @@
 
 ## 2026-09-24 — Visual map picker
 
-- Twenty-nine map cards should not become a long mobile page. A two-row, horizontal CSS grid keeps every map visually selectable in a compact area.
+- A large map catalog should not become a long mobile page. A two-row, horizontal CSS grid keeps every supported map visually selectable in a compact area.
 - Existing 800 px blueprint JPEGs also work as lightweight map thumbnails, avoiding another image set and additional storage.
 - Route thumbnail clicks and dropdown changes through one map-selection function so map, floor, site, blueprint, and strategy results cannot drift apart.
+
+## 2026-09-24 — Installable PWA
+
+- A relative manifest `start_url` and `scope` keep the same build valid under the GitHub Pages `/squadbook/` subpath and on localhost.
+- iOS still benefits from explicit Apple standalone metadata and a 180 px touch icon in addition to the web manifest.
+- Cache the static app shell and same-origin assets on demand, but bypass `data/supabase-config.json` entirely so offline support never stores connection configuration.
+- Delete only old caches carrying the `squadbook-` prefix because GitHub Pages projects can share one origin; clearing every origin cache could interfere with another installed site.
+- Serve cached static assets immediately while refreshing them in the background so future deployments do not leave an installed app permanently pinned to an old shared script or map catalog.
+- Keep unsupported maps out of the runtime catalog rather than deleting their source assets; this preserves regeneration inputs while preventing UI selection or caching.
