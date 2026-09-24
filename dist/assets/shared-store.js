@@ -159,7 +159,7 @@
         author_name: record.author,
         editor_id: record.editorId || null,
         editor_name: record.editor || null,
-        operators: record.operators.slice(0, 5),
+        operators: record.operators,
         checkpoints: record.steps.slice(0, 4),
         visual_references: storedReferences,
         plant_image_path: null,

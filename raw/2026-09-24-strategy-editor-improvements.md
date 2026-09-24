@@ -18,3 +18,8 @@ Source: user request on 2026-09-24.
 - Keep reference thumbnails unobstructed by removing the numbered `Reference 1`, `Reference 2`, and similar overlays; show only the tactical label and optional note below.
 - Add a compact `01`, `02`, `03` sequence beside the text label below each thumbnail. Restart at `01` for every strategy and preserve the original number while filtering.
 - Keep the homepage blueprint unchanged, but collapse it by default inside an opened strategy so visual references appear first; Expand opens the blueprint and Close returns it to the collapsed state.
+- Add a compact, collapsed `Wrong bomb site? Move strategy` control to Edit. Choosing another bomb site moves the strategy and updates its floor automatically without occupying normal editor space.
+- Keep a fitted blueprint centered while zooming, provide reliable Ctrl/Command plus mouse dragging, and default new Attack visual references to `Plant Spot` (`Rotations` for Defense).
+- Remove the five-operator recommendation cap so strategies can include backup choices when suggested operators are banned.
+- Make strategy-detail attribution a very small avatar/name chip, remove the collapsed blueprint card from the content flow, and use a small `Blueprint` text action beside the map/site line to open the full-screen map. Keep the homepage blueprint unchanged.
+- Give every visual reference a separate mobile `Camera` action that requests the rear camera, while preserving the normal gallery picker and desktop clipboard paste.

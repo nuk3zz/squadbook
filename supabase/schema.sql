@@ -42,7 +42,6 @@ create table if not exists public.strategies (
   post_image_path text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  check (cardinality(operators) <= 5),
   check (cardinality(checkpoints) <= 4)
 );
 
@@ -51,6 +50,20 @@ add column if not exists visual_references jsonb not null default '[]'::jsonb;
 
 alter table public.strategies add column if not exists editor_id uuid references public.profiles(id);
 alter table public.strategies add column if not exists editor_name text;
+
+do $$
+declare operator_limit record;
+begin
+  for operator_limit in
+    select conname
+    from pg_constraint
+    where conrelid = 'public.strategies'::regclass
+      and pg_get_constraintdef(oid) ilike '%cardinality(operators) <= 5%'
+  loop
+    execute format('alter table public.strategies drop constraint %I', operator_limit.conname);
+  end loop;
+end;
+$$;
 
 create or replace function public.set_updated_at()
 returns trigger

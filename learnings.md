@@ -69,10 +69,11 @@
 ## 2026-09-23 — Desktop blueprint controls
 
 - Ctrl plus wheel on Windows/Linux and Command plus wheel on macOS zooms around the pointer position from 1x to 4x.
-- Ctrl/Command plus left-drag pans a zoomed blueprint like a hand tool; pointer capture keeps the drag active when the cursor leaves the image.
+- Ctrl/Command plus left-drag pans a zoomed blueprint like a hand tool; window-level mouse-move/up handlers keep the drag active when the cursor leaves the image.
 - A normal wheel continues scrolling the page; in expanded mode it moves an already-zoomed blueprint.
 - Double-click resets the blueprint to its original framing.
 - A height-constrained viewer needs both `max-width: 100%` and `max-height: 100%` with auto dimensions. `height: 100%` can leave an intrinsic-size image clipped instead of fitted.
+- A centered fitted image needs a centered translation while its scaled size remains smaller than the viewport; clamping that translation to zero makes zoom appear to grow only toward the right.
 
 ## 2026-09-23 — Local strategy editor
 
@@ -145,7 +146,12 @@
 - Number overlays add no useful meaning once references have tactical labels and can hide the exact angle players need to see, so thumbnails should remain unobstructed.
 - Squad callouts still benefit from stable reference numbers; place `01`, `02`, and so on below the image and calculate them before filtering so a photo's number never changes.
 - Reusing the same blueprint node still works with different priorities: keep it visible during round selection, then apply a detail-only collapsed class so strategy screenshots lead without loading or duplicating another map.
+- A rare correction such as moving a strategy should stay behind a collapsed editor control. Selecting the destination bomb site is sufficient because the site catalog already owns the correct floor.
+- New visual references should default to the first valid side-specific label: `Plant Spot` on Attack and `Rotations` on Defense.
+- Operator recommendations should not inherit the five-player round limit; extra suggestions are useful as explicit backups when operators are banned.
+- On a phone, even a collapsed map toolbar consumes valuable vertical space. A small location-adjacent `Blueprint` text action preserves access while removing the entire map card from the normal strategy flow.
 - Strategy author avatars should resolve by stable profile ID rather than display name, so renamed players and duplicate-looking names still show the correct photo.
 - Creator and latest-editor identity need separate fields: updating the author fields would erase authorship, while an optional editor pair supports compact overlapping avatars and both names.
 - A focusable image box can support both ordinary file selection and direct screenshot paste without adding another dependency.
 - Attack/Defense operator filtering and removing colored icon backgrounds make the optional picker much faster to scan.
+- Mobile image capture should use a separate `accept="image/*" capture="environment"` file input. Keeping it separate from the ordinary input lets users explicitly choose Camera or Gallery, while the same compression and upload path handles both.

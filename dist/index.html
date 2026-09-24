@@ -516,16 +516,25 @@
 
     .detail h1 { font-size: clamp(2rem, 6vw, 4.2rem); }
 
+    .detail-path-row { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+    .detail-path-row .eyebrow { margin: 0; }
+    .detail-blueprint-link { border: 0; padding: 0; background: transparent; color: #aeb7c2; font-size: .7rem; font-weight: 900; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
     .author-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 5px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 8px 12px;
+      padding: 4px 7px;
       color: var(--muted);
+      font-size: .68rem;
       white-space: nowrap;
     }
+
+    .author-pill .author-avatar { width: 18px; height: 18px; font-size: .44rem; }
+    .author-pill .author-stack { padding-left: 5px; }
+    .author-pill .author-stack .author-avatar { margin-left: -5px; }
 
     .detail-actions { display: flex; align-items: center; gap: 9px; }
 
@@ -582,7 +591,7 @@
     }
 
     .media-slot.blueprint-slot .blueprint-canvas { min-height: 310px; }
-    .media-slot.blueprint-slot.collapsed { min-height: 0; }
+    .media-slot.blueprint-slot.collapsed { display: none; min-height: 0; }
     .media-slot.blueprint-slot.collapsed .blueprint-card { height: auto; }
     .blueprint-card.detail-collapsed .blueprint-canvas,
     .blueprint-card.detail-collapsed .blueprint-source { display: none; }
@@ -659,6 +668,9 @@
     .strategy-context { margin: 0; color: var(--muted); font-size: .85rem; }
     .editor-section { margin-top: 22px; }
     details.editor-section > summary { cursor: pointer; }
+    .move-strategy { margin-top: 12px; border: 1px solid var(--line); border-radius: 11px; padding: 10px 12px; background: #111419; }
+    .move-strategy summary { color: var(--muted); font-size: .78rem; font-weight: 800; cursor: pointer; }
+    .move-strategy select { width: 100%; min-height: 42px; margin-top: 10px; }
     .editor-label { display: block; margin-bottom: 9px; color: var(--muted); font-size: .72rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
 
     .operator-picker {
@@ -687,7 +699,7 @@
     .reference-dropzone img { width: 100%; height: 100%; object-fit: cover; }
     .reference-editor .profile-name-input { min-height: 42px; margin-top: 9px; }
     .reference-label-select { width: 100%; min-height: 42px; margin-top: 9px; border: 1px solid var(--line); border-radius: 10px; padding: 0 11px; background: var(--panel-2); color: var(--text); font: inherit; }
-    .reference-editor-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+    .reference-editor-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; margin-top: 8px; }
     .add-reference { width: 100%; margin-top: 10px; border-style: dashed; }
     .danger-button { border-color: #6a3333; color: #ff9893; }
     .strategy-form-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 24px; }
@@ -736,7 +748,7 @@
       .strategy-form { padding: 18px; }
       .checkpoint-grid, .reference-editor-list { grid-template-columns: 1fr; }
       .operator-picker { max-height: 205px; }
-      .detail-actions { align-items: flex-start; flex-direction: column; }
+      .detail-actions { align-items: center; flex-direction: row; flex-wrap: wrap; }
     }
 
     @media (max-width: 370px) {
@@ -809,7 +821,7 @@
       <button class="back" id="back" type="button">← All strategies</button>
       <div class="detail-top">
         <div>
-          <p class="eyebrow" id="detail-path">Strategy</p>
+          <div class="detail-path-row"><p class="eyebrow" id="detail-path">Strategy</p><button class="detail-blueprint-link" id="detail-blueprint-link" type="button">Blueprint</button></div>
           <h1 id="detail-title">Strategy</h1>
         </div>
         <div class="detail-actions"><div class="author-pill" id="detail-credit">Added by player</div><button class="secondary-button" id="edit-strategy" type="button">Edit</button></div>
@@ -886,10 +898,15 @@
       <label class="profile-name-label" for="strategy-title">Strategy name</label>
       <input class="profile-name-input" id="strategy-title" maxlength="42" required placeholder="Example: Garage take">
 
+      <details class="move-strategy" id="strategy-location-section" hidden>
+        <summary>Wrong bomb site? Move strategy</summary>
+        <select id="strategy-location" aria-label="Move strategy to bomb site"></select>
+      </details>
+
       <details class="editor-section" id="operator-section">
-        <summary class="editor-label">Operators · optional · choose up to 5</summary>
+        <summary class="editor-label">Operators · optional · include backups for bans</summary>
         <div class="operator-picker" id="operator-picker"></div>
-        <div class="operator-count" id="operator-count">0 / 5 selected</div>
+        <div class="operator-count" id="operator-count">0 selected</div>
       </details>
 
       <div class="editor-section">
@@ -963,6 +980,8 @@
     const strategyForm = document.querySelector("#strategy-form");
     const strategyId = document.querySelector("#strategy-id");
     const strategyTitle = document.querySelector("#strategy-title");
+    const strategyLocationSection = document.querySelector("#strategy-location-section");
+    const strategyLocation = document.querySelector("#strategy-location");
     const operatorPicker = document.querySelector("#operator-picker");
     const checkpointInputs = [...document.querySelectorAll("#checkpoint-grid input")];
     const profileButton = document.querySelector("#profile-button");
@@ -978,7 +997,7 @@
     const referenceEditorList = document.querySelector("#reference-editor-list");
     let playerProfile = null;
     let pendingPhoto = "";
-    const gesture = { scale: 1, x: 0, y: 0, startScale: 1, startX: 0, startY: 0, startDistance: 0, contentX: 0, contentY: 0, dragging: false, pointerId: null };
+    const gesture = { scale: 1, x: 0, y: 0, startScale: 1, startX: 0, startY: 0, startDistance: 0, contentX: 0, contentY: 0, dragging: false };
 
     function initials(name) {
       return name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase() || "?";
@@ -1167,7 +1186,8 @@
     }
 
     function newReference() {
-      return { id: crypto.randomUUID?.() || String(Date.now()), label: "Other", note: "", image: "", path: "" };
+      const defaultLabel = referenceLabelsBySide[sideSelect.value]?.[0] || "Other";
+      return { id: crypto.randomUUID?.() || String(Date.now()), label: defaultLabel, note: "", image: "", path: "" };
     }
 
     function strategyReferences(item) {
@@ -1192,11 +1212,15 @@
             ${reference.image ? `<img src="${reference.image}" alt="">` : `<span>Click here, or focus and press Ctrl/⌘ + V</span>`}
           </div>
           <input class="photo-input" type="file" accept="image/*" data-reference-upload>
+          <input class="photo-input" type="file" accept="image/*" capture="environment" data-reference-camera>
           <select class="reference-label-select" data-reference-label aria-label="Reference label">
             ${labels.map(label => `<option value="${escapeHtml(label)}" ${reference.label === label ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
           </select>
           <input class="profile-name-input" type="text" maxlength="90" value="${escapeHtml(reference.note)}" placeholder="Short note, angle, or instruction" data-reference-note>
-          <div class="reference-editor-actions"><button class="secondary-button" type="button" data-reference-remove>Remove</button></div>
+          <div class="reference-editor-actions">
+            <button class="secondary-button" type="button" data-reference-camera-button>Camera</button>
+            <button class="secondary-button" type="button" data-reference-remove>Remove</button>
+          </div>
         </div>
       `).join("");
     }
@@ -1217,7 +1241,7 @@
           <img src="assets/operators/${slug}.svg" alt="">
         </button>
       `).join("");
-      document.querySelector("#operator-count").textContent = `${selectedOperators.length} / 5 selected`;
+      document.querySelector("#operator-count").textContent = `${selectedOperators.length} selected`;
     }
 
     function setSyncStatus(mode, label, title) {
@@ -1262,7 +1286,12 @@
       if (!map || siteSelect.disabled) return;
       strategyId.value = item?.id || "";
       strategyTitle.value = item?.title || "";
-      selectedOperators = [...(item?.operators || [])].slice(0, 5);
+      strategyLocationSection.hidden = !item;
+      strategyLocationSection.open = false;
+      if (item) {
+        strategyLocation.innerHTML = (sitesByMap[item.map] || []).map(site => `<option value="${site.id}" ${site.id === item.site ? "selected" : ""}>${escapeHtml(site.label)}</option>`).join("");
+      }
+      selectedOperators = [...(item?.operators || [])];
       pendingReferences = strategyReferences(item).map(reference => ({ ...reference }));
       checkpointInputs.forEach((input, index) => input.value = item?.steps?.[index] || "");
       document.querySelector("#strategy-form-title").textContent = item ? "Edit strategy" : "Add strategy";
@@ -1293,12 +1322,20 @@
     function clampGesture(image) {
       const scaledWidth = image.clientWidth * gesture.scale;
       const scaledHeight = image.clientHeight * gesture.scale;
-      const minX = scaledWidth > blueprintCanvas.clientWidth ? blueprintCanvas.clientWidth - image.offsetLeft - scaledWidth : 0;
-      const maxX = scaledWidth > blueprintCanvas.clientWidth ? -image.offsetLeft : 0;
-      const minY = scaledHeight > blueprintCanvas.clientHeight ? blueprintCanvas.clientHeight - image.offsetTop - scaledHeight : 0;
-      const maxY = scaledHeight > blueprintCanvas.clientHeight ? -image.offsetTop : 0;
-      gesture.x = Math.max(minX, Math.min(maxX, gesture.x));
-      gesture.y = Math.max(minY, Math.min(maxY, gesture.y));
+      if (scaledWidth <= blueprintCanvas.clientWidth) {
+        gesture.x = (blueprintCanvas.clientWidth - scaledWidth) / 2 - image.offsetLeft;
+      } else {
+        const minX = blueprintCanvas.clientWidth - image.offsetLeft - scaledWidth;
+        const maxX = -image.offsetLeft;
+        gesture.x = Math.max(minX, Math.min(maxX, gesture.x));
+      }
+      if (scaledHeight <= blueprintCanvas.clientHeight) {
+        gesture.y = (blueprintCanvas.clientHeight - scaledHeight) / 2 - image.offsetTop;
+      } else {
+        const minY = blueprintCanvas.clientHeight - image.offsetTop - scaledHeight;
+        const maxY = -image.offsetTop;
+        gesture.y = Math.max(minY, Math.min(maxY, gesture.y));
+      }
       image.style.transform = `translate(${gesture.x}px, ${gesture.y}px) scale(${gesture.scale})`;
     }
 
@@ -1307,7 +1344,6 @@
       gesture.x = 0;
       gesture.y = 0;
       gesture.dragging = false;
-      gesture.pointerId = null;
       blueprintCanvas.classList.remove("is-panning");
       const image = blueprintCanvas.querySelector("img");
       if (image) image.style.transform = "";
@@ -1337,21 +1373,19 @@
       clampGesture(image);
     }, { passive: false });
 
-    blueprintCanvas.addEventListener("pointerdown", event => {
-      if (event.pointerType !== "mouse" || event.button !== 0 || (!event.ctrlKey && !event.metaKey)) return;
+    blueprintCanvas.addEventListener("mousedown", event => {
+      if (event.button !== 0 || (!event.ctrlKey && !event.metaKey)) return;
       const image = blueprintCanvas.querySelector("img");
       if (!image) return;
       event.preventDefault();
       gesture.dragging = true;
-      gesture.pointerId = event.pointerId;
       gesture.startX = event.clientX - gesture.x;
       gesture.startY = event.clientY - gesture.y;
       blueprintCanvas.classList.add("is-panning");
-      blueprintCanvas.setPointerCapture(event.pointerId);
     });
 
-    blueprintCanvas.addEventListener("pointermove", event => {
-      if (!gesture.dragging || event.pointerId !== gesture.pointerId) return;
+    window.addEventListener("mousemove", event => {
+      if (!gesture.dragging) return;
       const image = blueprintCanvas.querySelector("img");
       if (!image) return;
       event.preventDefault();
@@ -1360,16 +1394,13 @@
       clampGesture(image);
     });
 
-    function stopBlueprintPan(event) {
-      if (!gesture.dragging || (event.pointerId !== undefined && event.pointerId !== gesture.pointerId)) return;
+    function stopBlueprintPan() {
+      if (!gesture.dragging) return;
       gesture.dragging = false;
-      if (gesture.pointerId !== null && blueprintCanvas.hasPointerCapture(gesture.pointerId)) blueprintCanvas.releasePointerCapture(gesture.pointerId);
-      gesture.pointerId = null;
       blueprintCanvas.classList.remove("is-panning");
     }
 
-    blueprintCanvas.addEventListener("pointerup", stopBlueprintPan);
-    blueprintCanvas.addEventListener("pointercancel", stopBlueprintPan);
+    window.addEventListener("mouseup", stopBlueprintPan);
     window.addEventListener("keydown", event => {
       if (event.key === "Control" || event.key === "Meta") blueprintCanvas.classList.add("hand-ready");
     });
@@ -1378,7 +1409,7 @@
     });
     window.addEventListener("blur", () => {
       blueprintCanvas.classList.remove("hand-ready");
-      stopBlueprintPan({});
+      stopBlueprintPan();
     });
 
     blueprintCanvas.addEventListener("wheel", event => {
@@ -1510,7 +1541,7 @@
       const slug = button.dataset.operator;
       if (selectedOperators.includes(slug)) {
         selectedOperators = selectedOperators.filter(item => item !== slug);
-      } else if (selectedOperators.length < 5) {
+      } else {
         selectedOperators.push(slug);
       }
       renderOperatorPicker();
@@ -1531,6 +1562,10 @@
         renderReferenceEditors();
         return;
       }
+      if (event.target.closest("[data-reference-camera-button]")) {
+        card.querySelector("[data-reference-camera]").click();
+        return;
+      }
       if (event.target.closest(".reference-dropzone")) {
         card.querySelector("[data-reference-upload]").click();
       }
@@ -1548,7 +1583,7 @@
         if (reference) reference.label = event.target.value;
         return;
       }
-      if (event.target.matches("[data-reference-upload]")) {
+      if (event.target.matches("[data-reference-upload], [data-reference-camera]")) {
         await setReferenceImage(card.dataset.referenceId, event.target.files?.[0]);
       }
     });
@@ -1564,13 +1599,16 @@
     strategyForm.addEventListener("submit", async event => {
       event.preventDefault();
       const existing = strategies.find(item => item.id === strategyId.value);
+      const movedSite = existing
+        ? (sitesByMap[existing.map] || []).find(site => site.id === strategyLocation.value)
+        : null;
       const record = {
         ...existing,
         id: existing?.id || (crypto.randomUUID?.() || String(Date.now())),
-        map: mapSelect.value,
-        side: sideSelect.value,
-        site: siteSelect.value,
-        floor: Number(floorSelect.value),
+        map: existing?.map || mapSelect.value,
+        side: existing?.side || sideSelect.value,
+        site: movedSite?.id || siteSelect.value,
+        floor: movedSite?.floor ?? Number(floorSelect.value),
         title: strategyTitle.value.trim(),
         author: existing?.author || playerProfile.name,
         authorId: existing?.authorId || playerProfile.id,
@@ -1591,6 +1629,11 @@
         strategies = existing ? strategies.map(item => item.id === saved.id ? saved : item) : [...strategies, saved];
         activeStrategy = saved;
         strategyDialog.close();
+        if (existing && saved.site !== siteSelect.value) {
+          siteSelect.value = saved.site;
+          syncFloorToSite();
+          renderBlueprint();
+        }
         renderStrategies();
         if (detail.classList.contains("active")) openStrategy(saved);
       } catch (error) {
@@ -1805,6 +1848,16 @@
       if (!button || !activeStrategy) return;
       activeReferenceFilter = button.dataset.referenceFilter;
       renderStrategyReferences(activeStrategy);
+    });
+
+    document.querySelector("#detail-blueprint-link").addEventListener("click", () => {
+      if (!detail.classList.contains("active")) return;
+      blueprintCard.classList.remove("detail-collapsed");
+      detailBlueprintHome.classList.remove("collapsed");
+      blueprintCard.classList.add("expanded");
+      resetBlueprintGesture();
+      document.querySelector("#blueprint-expand").textContent = "Close";
+      document.body.style.overflow = "hidden";
     });
 
     document.querySelector("#blueprint-expand").addEventListener("click", event => {

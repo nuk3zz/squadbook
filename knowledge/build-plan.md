@@ -27,7 +27,8 @@ Status: complete.
 - Completed visual foundation: 29 selectable maps, an automated compact blueprint exporter, and 81 locally stored operator icons.
 - Completed lightweight identity: each device creates a name-and-photo player profile with no email, password, or verification; tapping the header profile edits it.
 - Removed prototype player names and strategies so real squad content starts clean.
-- Completed strategy editor: add/edit/delete strategies, optionally select up to five side-specific operator icons, enter four short checkpoints, and attach any number of generic photo-and-note references.
+- Completed strategy editor: add/edit/delete strategies, optionally select any number of side-specific operator icons including ban backups, enter four short checkpoints, and attach any number of generic photo-and-note references.
+- Editing includes an unobtrusive collapsed control for moving an accidentally misplaced strategy to another bomb site on the same map; the destination site supplies the correct floor automatically.
 - Completed bomb-site catalog: 104 selectable sites across the 27 maps whose source blueprints contain Bomb objectives; arcade-only Close Quarters and District correctly show no Bomb sites.
 - Bomb-site IDs are stable across callout-name changes, and the four earlier Clubhouse IDs migrate when old local strategies are loaded.
 - Completed creator and latest-editor attribution through stable player profiles, including compact overlapping photo-or-initials avatars and both names when different players contribute.
@@ -38,12 +39,12 @@ Optional gadget references were deliberately left out to keep the match-time too
 ## Visual-content decision
 
 - A selected floor blueprint appears above the strategy list and is carried into the opened strategy.
-- The homepage keeps the blueprint visible, while a strategy detail starts with its blueprint collapsed so the strategy screenshots are immediately visible; Expand opens the map full-screen and Close collapses it again.
+- The homepage keeps the blueprint visible. Strategy detail hides the map card so screenshots are immediately visible and exposes only a tiny `Blueprint` text action beside the location; it opens the map full-screen and Close returns to the photo-first view.
 - Each floor is automatically cropped around the playable layout and exported as an 800 px JPEG.
 - One finger keeps scrolling the page normally; two fingers zoom and move the blueprint up to 4x on phones. Desktop blueprints fit fully at 1x, use Ctrl/Command plus wheel to zoom, and Ctrl/Command plus drag as a hand tool.
 - Roof layers are hidden from the match-time floor selector, and the embedded desktop blueprint is height-limited while Expand retains the large view.
 - Strategy operator recommendations use plain icons as the primary language; Attack and Defense show only their corresponding roster, and names remain available as accessibility labels and hover titles.
-- Every visual reference is a screenshot plus optional short note and a side-specific tactical label. The strategy view shows only labels actually used and can filter the gallery without changing the saved order. Desktop users can choose a file or paste a screenshot with Ctrl/Command+V.
+- Every visual reference is a screenshot plus optional short note and a side-specific tactical label. The strategy view shows only labels actually used and can filter the gallery without changing the saved order. Desktop users can choose a file or paste a screenshot with Ctrl/Command+V; phone users also get a dedicated rear-camera action without losing the gallery picker.
 - Huge source SVGs are used only during export and immediately discarded; the runtime serves compact local JPEGs with no internet dependency.
 
 ## Stage 3 — Shared squad version
