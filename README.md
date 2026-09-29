@@ -11,6 +11,7 @@ A mobile-first visual strategy playbook for Rainbow Six Siege squads. Pick a map
 - Mobile pinch-to-zoom and desktop Ctrl/Command-wheel blueprint zoom
 - Lightweight player profiles with no email or verification code
 - Unlimited labeled screenshot-and-note references with gallery filters, file upload, or clipboard paste
+- Standalone bomb-site setups for cams, drone spots, gadget placements, angles, and tricks—kept separate from full strategies
 - Creator and latest-editor profile attribution with compact avatars
 - Four-digit profile recovery across browsers and devices
 - Optional Supabase sharing, private media storage, and realtime refresh

@@ -170,3 +170,9 @@
 - Delete only old caches carrying the `squadbook-` prefix because GitHub Pages projects can share one origin; clearing every origin cache could interfere with another installed site.
 - Serve cached static assets immediately while refreshing them in the background so future deployments do not leave an installed app permanently pinned to an old shared script or map catalog.
 - Keep unsupported maps out of the runtime catalog rather than deleting their source assets; this preserves regeneration inputs while preventing UI selection or caching.
+
+## 2026-09-29 — Standalone site setups
+
+- A full strategy and a reusable site detail have different match-time jobs. Strategies retain operators and checkpoints; site setups contain only a short title, type, and visual references.
+- Keeping both record types in the existing `strategies` table with an `entry_type` discriminator preserves the proven media, attribution, realtime, and editing paths without adding a parallel backend.
+- Bomb-site results should always render strategies first and site setups second as a denser visual grid, so small cams and tricks remain immediately visible without pretending to be round plans.

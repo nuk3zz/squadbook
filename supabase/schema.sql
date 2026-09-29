@@ -50,6 +50,21 @@ add column if not exists visual_references jsonb not null default '[]'::jsonb;
 
 alter table public.strategies add column if not exists editor_id uuid references public.profiles(id);
 alter table public.strategies add column if not exists editor_name text;
+alter table public.strategies add column if not exists entry_type text not null default 'strategy';
+alter table public.strategies add column if not exists setup_type text;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.strategies'::regclass
+      and conname = 'strategies_entry_type_check'
+  ) then
+    alter table public.strategies
+    add constraint strategies_entry_type_check check (entry_type in ('strategy', 'setup'));
+  end if;
+end;
+$$;
 
 do $$
 declare operator_limit record;

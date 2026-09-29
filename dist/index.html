@@ -445,6 +445,18 @@
       gap: 14px;
     }
 
+    .setup-section .section-head { margin-top: 28px; }
+    .setup-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .setup-card { overflow: hidden; min-width: 0; border: 1px solid var(--line); border-radius: 15px; padding: 0; background: var(--panel); color: var(--text); text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
+    .setup-card:hover, .setup-card:focus-visible { transform: translateY(-2px); border-color: #56606d; outline: none; }
+    .setup-thumb { position: relative; display: grid; place-items: center; aspect-ratio: 16 / 9; overflow: hidden; background: var(--panel-2); color: var(--muted); font-size: .72rem; }
+    .setup-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .setup-photo-count { position: absolute; z-index: 1; right: 7px; bottom: 7px; border-radius: 999px; padding: 4px 7px; background: rgba(5, 6, 8, .82); color: white; font-size: .64rem; font-weight: 900; }
+    .setup-card-body { display: grid; gap: 6px; padding: 11px 12px 13px; }
+    .setup-kind { color: var(--accent); font-size: .64rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .setup-card strong { overflow: hidden; font-size: .9rem; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+    .setup-grid .empty { grid-column: 1 / -1; }
+
     .strategy-card {
       position: relative;
       overflow: hidden;
@@ -774,6 +786,8 @@
       .blueprint-canvas { min-height: 205px; }
       .blueprint-toolbar { padding: 10px 12px; }
       .strategy-grid, .media-grid, .quick-grid { grid-template-columns: 1fr; }
+      .setup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .setup-card-body { padding: 9px 10px 11px; }
       .strategy-card { min-height: 190px; padding: 18px; }
       .strategy-card .tag { margin-bottom: 22px; }
       .strategy-card .card-foot { margin-top: 20px; }
@@ -864,10 +878,18 @@
       </div>
 
       <div id="strategy-list" class="strategy-grid"></div>
+
+      <section class="setup-section">
+        <div class="section-head">
+          <h2>Site setups</h2>
+          <div class="section-actions"><span id="setup-count">0 setups</span><button class="primary-button" id="add-setup" type="button">+ Add setup</button></div>
+        </div>
+        <div id="setup-list" class="setup-grid"></div>
+      </section>
     </section>
 
     <section class="detail" id="detail" aria-live="polite">
-      <button class="back" id="back" type="button">← All strategies</button>
+      <button class="back" id="back" type="button">← Bomb site</button>
       <div class="detail-top">
         <div>
           <div class="detail-path-row"><p class="eyebrow" id="detail-path">Strategy</p><button class="detail-blueprint-link" id="detail-blueprint-link" type="button">Blueprint</button></div>
@@ -889,7 +911,7 @@
           <div class="panel-title">Operator lineup</div>
           <div class="operators" id="operators"></div>
         </div>
-        <div class="panel">
+        <div class="panel" id="checkpoint-panel">
           <div class="panel-title">Round checkpoints</div>
           <ol class="steps" id="steps"></ol>
         </div>
@@ -947,8 +969,13 @@
       <label class="profile-name-label" for="strategy-title">Strategy name</label>
       <input class="profile-name-input" id="strategy-title" maxlength="42" required placeholder="Example: Garage take">
 
+      <div class="editor-section" id="setup-type-section" hidden>
+        <label class="editor-label" for="setup-type">Setup type</label>
+        <select id="setup-type" aria-label="Setup type"></select>
+      </div>
+
       <details class="move-strategy" id="strategy-location-section" hidden>
-        <summary>Wrong bomb site? Move strategy</summary>
+        <summary id="strategy-location-summary">Wrong bomb site? Move strategy</summary>
         <select id="strategy-location" aria-label="Move strategy to bomb site"></select>
       </details>
 
@@ -958,7 +985,7 @@
         <div class="operator-count" id="operator-count">0 selected</div>
       </details>
 
-      <div class="editor-section">
+      <div class="editor-section" id="checkpoint-section">
         <span class="editor-label">Round checkpoints · short labels</span>
         <div class="checkpoint-grid" id="checkpoint-grid">
           <input class="profile-name-input" maxlength="34" placeholder="01 · First action">
@@ -969,14 +996,14 @@
       </div>
 
       <div class="editor-section">
-        <span class="editor-label">Visual references · optional</span>
+        <span class="editor-label" id="visual-reference-label">Visual references · optional</span>
         <div class="reference-editor-list" id="reference-editor-list"></div>
         <button class="secondary-button add-reference" id="add-reference" type="button">+ Add photo reference</button>
       </div>
 
       <div class="strategy-form-actions">
         <button class="secondary-button danger-button" id="delete-strategy" type="button">Delete</button>
-        <div><button class="secondary-button" id="strategy-cancel" type="button">Cancel</button><button class="primary-button" type="submit">Save strategy</button></div>
+        <div><button class="secondary-button" id="strategy-cancel" type="button">Cancel</button><button class="primary-button" id="strategy-save" type="submit">Save strategy</button></div>
       </div>
     </form>
   </dialog>
@@ -997,6 +1024,10 @@
       attack: ["Plant Spot", "Map Control", "Walls to Breach", "LOS (Line of sights)", "Smoke / Sense", "Drone Placements", "Vertical Play", "Other"],
       defense: ["Rotations", "Map Control", "Walls to Hold", "LOS (Line of sights)", "Camera Placements", "Vertical Play", "Other"]
     };
+    const setupTypesBySide = {
+      attack: ["Drone Placement", "Lineup", "Angle / LOS", "Vertical Play", "Entry / Spawn", "Trick", "Other"],
+      defense: ["Camera Placement", "Gadget Setup", "Rotation", "Angle / LOS", "Vertical Play", "Wall Setup", "Trick", "Other"]
+    };
     const excludedMapIds = new Set(["bartlett", "closequarters", "district"]);
     const legacyClubSiteIds = {
       "church-arsenal": "0-4",
@@ -1011,6 +1042,7 @@
     let availableProfiles = [];
     let selectedProfileId = "";
     let activeReferenceFilter = "All";
+    let editingEntryType = "strategy";
     let store = null;
     let unsubscribeFromStrategies = () => {};
 
@@ -1020,20 +1052,27 @@
     const floorSelect = document.querySelector("#floor");
     const siteSelect = document.querySelector("#site");
     const list = document.querySelector("#strategy-list");
+    const setupList = document.querySelector("#setup-list");
     const browse = document.querySelector("#browse");
     const detail = document.querySelector("#detail");
     const blueprintCard = document.querySelector("#blueprint-card");
     const blueprintCanvas = document.querySelector("#blueprint-canvas");
     const detailBlueprintHome = document.querySelector("#detail-blueprint-home");
     const addStrategyButton = document.querySelector("#add-strategy");
+    const addSetupButton = document.querySelector("#add-setup");
     const editStrategyButton = document.querySelector("#edit-strategy");
     const strategyDialog = document.querySelector("#strategy-dialog");
     const strategyForm = document.querySelector("#strategy-form");
     const strategyId = document.querySelector("#strategy-id");
     const strategyTitle = document.querySelector("#strategy-title");
+    const setupTypeSection = document.querySelector("#setup-type-section");
+    const setupTypeSelect = document.querySelector("#setup-type");
     const strategyLocationSection = document.querySelector("#strategy-location-section");
     const strategyLocation = document.querySelector("#strategy-location");
     const operatorPicker = document.querySelector("#operator-picker");
+    const operatorSection = document.querySelector("#operator-section");
+    const checkpointSection = document.querySelector("#checkpoint-section");
+    const checkpointPanel = document.querySelector("#checkpoint-panel");
     const checkpointInputs = [...document.querySelectorAll("#checkpoint-grid input")];
     const profileButton = document.querySelector("#profile-button");
     const profileDialog = document.querySelector("#profile-dialog");
@@ -1253,7 +1292,9 @@
 
     function renderReferenceEditors() {
       if (!pendingReferences.length) {
-        referenceEditorList.innerHTML = `<div class="empty">Add only the screenshots this strategy needs.</div>`;
+        referenceEditorList.innerHTML = `<div class="empty">${editingEntryType === "setup"
+          ? "Add the screenshots and short notes that belong to this setup."
+          : "Add only the screenshots this strategy needs."}</div>`;
         return;
       }
       const labels = referenceLabelsBySide[sideSelect.value] || referenceLabelsBySide.attack;
@@ -1305,6 +1346,10 @@
     function normalizeStrategies(records) {
       return records.map(strategy => ({
         ...strategy,
+        entryType: strategy.entryType === "setup" ? "setup" : "strategy",
+        setupType: strategy.setupType || "",
+        operators: Array.isArray(strategy.operators) ? strategy.operators : [],
+        steps: Array.isArray(strategy.steps) ? strategy.steps : [],
         site: strategy.map === "club" ? (legacyClubSiteIds[strategy.site] || strategy.site) : strategy.site,
         references: strategyReferences(strategy)
       }));
@@ -1328,27 +1373,41 @@
       }
     }
 
-    function openStrategyEditor(item = null) {
+    function openStrategyEditor(item = null, requestedType = "strategy") {
       if (!playerProfile) {
         openProfileEditor();
         return;
       }
       const map = currentMap();
       if (!map || siteSelect.disabled) return;
+      editingEntryType = item?.entryType === "setup" || requestedType === "setup" ? "setup" : "strategy";
+      const isSetup = editingEntryType === "setup";
       strategyId.value = item?.id || "";
       strategyTitle.value = item?.title || "";
+      strategyTitle.previousElementSibling.textContent = isSetup ? "Setup name" : "Strategy name";
+      strategyTitle.placeholder = isSetup ? "Example: Valk cam on square" : "Example: Garage take";
+      setupTypeSection.hidden = !isSetup;
+      const setupTypes = setupTypesBySide[item?.side || sideSelect.value] || setupTypesBySide.attack;
+      setupTypeSelect.innerHTML = setupTypes.map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join("");
+      setupTypeSelect.value = setupTypes.includes(item?.setupType) ? item.setupType : setupTypes[0];
+      operatorSection.hidden = isSetup;
+      checkpointSection.hidden = isSetup;
+      document.querySelector("#visual-reference-label").textContent = isSetup ? "Setup photos · add at least one" : "Visual references · optional";
       strategyLocationSection.hidden = !item;
       strategyLocationSection.open = false;
+      document.querySelector("#strategy-location-summary").textContent = `Wrong bomb site? Move ${isSetup ? "setup" : "strategy"}`;
       if (item) {
         strategyLocation.innerHTML = (sitesByMap[item.map] || []).map(site => `<option value="${site.id}" ${site.id === item.site ? "selected" : ""}>${escapeHtml(site.label)}</option>`).join("");
       }
-      selectedOperators = [...(item?.operators || [])];
+      selectedOperators = isSetup ? [] : [...(item?.operators || [])];
       pendingReferences = strategyReferences(item).map(reference => ({ ...reference }));
-      checkpointInputs.forEach((input, index) => input.value = item?.steps?.[index] || "");
-      document.querySelector("#strategy-form-title").textContent = item ? "Edit strategy" : "Add strategy";
+      checkpointInputs.forEach((input, index) => input.value = isSetup ? "" : (item?.steps?.[index] || ""));
+      document.querySelector("#strategy-form-title").textContent = `${item ? "Edit" : "Add"} ${isSetup ? "setup" : "strategy"}`;
       document.querySelector("#strategy-context").textContent = `${map.name} · ${siteLabel()} · ${sideSelect.value === "attack" ? "Attack" : "Defense"}`;
       document.querySelector("#delete-strategy").hidden = !item;
-      document.querySelector("#operator-section").open = selectedOperators.length > 0;
+      document.querySelector("#delete-strategy").textContent = `Delete ${isSetup ? "setup" : "strategy"}`;
+      document.querySelector("#strategy-save").textContent = `Save ${isSetup ? "setup" : "strategy"}`;
+      operatorSection.open = selectedOperators.length > 0;
       renderOperatorPicker();
       renderReferenceEditors();
       strategyDialog.showModal();
@@ -1583,6 +1642,7 @@
     });
 
     addStrategyButton.addEventListener("click", () => openStrategyEditor());
+    addSetupButton.addEventListener("click", () => openStrategyEditor(null, "setup"));
     editStrategyButton.addEventListener("click", () => activeStrategy && openStrategyEditor(activeStrategy));
     document.querySelector("#strategy-close").addEventListener("click", () => strategyDialog.close());
     document.querySelector("#strategy-cancel").addEventListener("click", () => strategyDialog.close());
@@ -1665,14 +1725,20 @@
         authorId: existing?.authorId || playerProfile.id,
         editor: existing ? playerProfile.name : "",
         editorId: existing ? playerProfile.id : "",
-        operators: [...selectedOperators],
-        steps: checkpointInputs.map(input => input.value.trim()).filter(Boolean),
+        entryType: editingEntryType,
+        setupType: editingEntryType === "setup" ? setupTypeSelect.value : "",
+        operators: editingEntryType === "setup" ? [] : [...selectedOperators],
+        steps: editingEntryType === "setup" ? [] : checkpointInputs.map(input => input.value.trim()).filter(Boolean),
         references: pendingReferences.filter(reference => reference.image).map(reference => ({ ...reference, label: reference.label || "Other", note: reference.note.trim() })),
         previousReferences: strategyReferences(existing),
         createdAt: existing?.createdAt || Date.now(),
         updatedAt: Date.now()
       };
       if (!record.title) return;
+      if (record.entryType === "setup" && !record.references.length) {
+        alert("Add at least one photo so the setup is visible in the site grid.");
+        return;
+      }
       const submitButton = strategyForm.querySelector('[type="submit"]');
       submitButton.disabled = true;
       try {
@@ -1690,8 +1756,8 @@
       } catch (error) {
         console.error(error);
         alert(store.mode === "shared"
-          ? "The strategy could not sync. Check the connection and try again."
-          : "This browser is out of storage. Remove one of the strategy images and try again.");
+          ? `The ${record.entryType} could not sync. Check the connection and try again.`
+          : `This browser is out of storage. Remove one of the ${record.entryType} images and try again.`);
       } finally {
         submitButton.disabled = false;
       }
@@ -1700,7 +1766,7 @@
     document.querySelector("#delete-strategy").addEventListener("click", async () => {
       const id = strategyId.value;
       const item = strategies.find(strategy => strategy.id === id);
-      if (!item || !confirm(`Delete “${item.title}”?`)) return;
+      if (!item || !confirm(`Delete ${item.entryType === "setup" ? "setup" : "strategy"} “${item.title}”?`)) return;
       try {
         await store.deleteStrategy(item);
         strategies = strategies.filter(strategy => strategy.id !== id);
@@ -1710,7 +1776,7 @@
         renderStrategies();
       } catch (error) {
         console.error(error);
-        alert("The strategy could not be deleted. Check the connection and try again.");
+        alert(`The ${item.entryType === "setup" ? "setup" : "strategy"} could not be deleted. Check the connection and try again.`);
       }
     });
 
@@ -1816,31 +1882,57 @@
     }
 
     function renderStrategies() {
-      const items = strategies.filter(item => item.map === mapSelect.value && item.side === sideSelect.value && item.site === siteSelect.value);
+      const siteItems = strategies.filter(item => item.map === mapSelect.value && item.side === sideSelect.value && item.site === siteSelect.value);
+      const items = siteItems.filter(item => item.entryType !== "setup");
+      const setups = siteItems.filter(item => item.entryType === "setup");
       const sideLabel = sideSelect.value === "attack" ? "Attack" : "Defense";
       document.querySelector("#result-title").textContent = `${siteLabel()} · ${sideLabel}`;
       document.querySelector("#result-count").textContent = `${items.length} ${items.length === 1 ? "strategy" : "strategies"}`;
+      document.querySelector("#setup-count").textContent = `${setups.length} ${setups.length === 1 ? "setup" : "setups"}`;
 
       if (!items.length) {
         list.innerHTML = `<div class="empty">No strategies here yet. Tap “Add strategy” to create the first one.</div>`;
-        return;
+      } else {
+        list.innerHTML = items.map((item, index) => `
+          <button class="strategy-card" type="button" data-id="${item.id}">
+            <span class="strategy-number">${String(index + 1).padStart(2, "0")}</span>
+            <span class="tag">Ready to run</span>
+            <h3>${escapeHtml(item.title)}</h3>
+            <span class="mini-operators">${item.operators.slice(0, 5).map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}</span>
+            <span class="card-foot">
+              <span class="byline">${strategyCredit(item)}</span>
+              <span class="open">OPEN →</span>
+            </span>
+          </button>
+        `).join("");
       }
 
-      list.innerHTML = items.map((item, index) => `
-        <button class="strategy-card" type="button" data-id="${item.id}">
-          <span class="strategy-number">0${index + 1}</span>
-          <span class="tag">Ready to run</span>
-          <h3>${escapeHtml(item.title)}</h3>
-          <span class="mini-operators">${item.operators.slice(0, 5).map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}</span>
-          <span class="card-foot">
-            <span class="byline">${strategyCredit(item)}</span>
-            <span class="open">OPEN →</span>
-          </span>
-        </button>
-      `).join("");
+      if (!setups.length) {
+        setupList.innerHTML = `<div class="empty">No standalone setups yet. Add a cam, angle, gadget setup, or trick for this site.</div>`;
+      } else {
+        setupList.innerHTML = setups.map(item => {
+          const preview = strategyReferences(item)[0];
+          const photoCount = strategyReferences(item).length;
+          return `
+            <button class="setup-card" type="button" data-setup-id="${item.id}">
+              <span class="setup-thumb">
+                ${preview?.image ? `<img src="${preview.image}" alt="">` : "No photo"}
+                ${photoCount > 1 ? `<span class="setup-photo-count">${photoCount} photos</span>` : ""}
+              </span>
+              <span class="setup-card-body">
+                <span class="setup-kind">${escapeHtml(item.setupType || "Other")}</span>
+                <strong>${escapeHtml(item.title)}</strong>
+              </span>
+            </button>
+          `;
+        }).join("");
+      }
 
       list.querySelectorAll("[data-id]").forEach(button => {
         button.addEventListener("click", () => openStrategy(items.find(item => item.id === button.dataset.id)));
+      });
+      setupList.querySelectorAll("[data-setup-id]").forEach(button => {
+        button.addEventListener("click", () => openStrategy(setups.find(item => item.id === button.dataset.setupId)));
       });
     }
 
@@ -1888,13 +1980,15 @@
       activeStrategy = item;
       const map = currentMap();
       const sideLabel = sideSelect.value === "attack" ? "Attack" : "Defense";
-      document.querySelector("#detail-path").textContent = `${map.name} · ${siteLabel()} · ${sideLabel}`;
+      const isSetup = item.entryType === "setup";
+      document.querySelector("#detail-path").textContent = `${isSetup ? `${item.setupType || "Site setup"} · ` : ""}${map.name} · ${siteLabel()} · ${sideLabel}`;
       document.querySelector("#detail-title").textContent = item.title;
       document.querySelector("#detail-credit").innerHTML = strategyCredit(item);
-      document.querySelector("#operator-panel").hidden = !item.operators.length;
+      document.querySelector("#operator-panel").hidden = isSetup || !item.operators.length;
       document.querySelector("#operators").innerHTML = item.operators.map(slug => `
         <span class="operator-slot"><img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}"></span>
       `).join("");
+      checkpointPanel.hidden = isSetup || !item.steps.length;
       document.querySelector("#steps").innerHTML = item.steps.map((step, index) => `
         <li><b>0${index + 1}</b>${escapeHtml(step)}</li>
       `).join("");

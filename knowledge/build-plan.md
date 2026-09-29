@@ -29,6 +29,7 @@ Status: complete.
 - Completed lightweight identity: each device creates a name-and-photo player profile with no email, password, or verification; tapping the header profile edits it.
 - Removed prototype player names and strategies so real squad content starts clean.
 - Completed strategy editor: add/edit/delete strategies, optionally select any number of side-specific operator icons including ban backups, enter four short checkpoints, and attach any number of generic photo-and-note references.
+- Added standalone site setups for reusable cams, gadget placements, angles, lineups, and tricks. They belong directly to the selected map, side, and Bomb site, use a lightweight photo-first editor, and appear in their own grid after full strategies.
 - Editing includes an unobtrusive collapsed control for moving an accidentally misplaced strategy to another bomb site on the same map; the destination site supplies the correct floor automatically.
 - Completed bomb-site catalog: 104 selectable sites across the 27 maps whose source blueprints contain Bomb objectives; arcade-only Close Quarters and District correctly show no Bomb sites.
 - Bomb-site IDs are stable across callout-name changes, and the four earlier Clubhouse IDs migrate when old local strategies are loaded.
