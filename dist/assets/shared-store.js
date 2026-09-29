@@ -27,6 +27,13 @@
       mode: "local",
       supportsProfileRecovery: false,
       async initialize() {},
+      async loadCachedProfile() {
+        return readJson(profileStorageKey, null);
+      },
+      async loadCachedStrategies() {
+        const records = readJson(strategyStorageKey, []);
+        return Array.isArray(records) ? records : [];
+      },
       async loadProfile() {
         return readJson(profileStorageKey, null);
       },
@@ -66,8 +73,32 @@
     const client = window.supabase.createClient(config.url, config.publishableKey, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
     });
+    const sharedProfileCacheKey = `squadbook.sharedProfile.v1.${config.url}`;
+    const sharedStrategyCacheKey = `squadbook.sharedStrategies.v1.${config.url}`;
     let user = null;
     let activeProfileId = "";
+
+    function cacheProfile(profile) {
+      try {
+        if (profile) localStorage.setItem(sharedProfileCacheKey, JSON.stringify(profile));
+        else localStorage.removeItem(sharedProfileCacheKey);
+      } catch (error) {
+        console.warn("Could not cache the shared profile.", error);
+      }
+    }
+
+    function cachedStrategies() {
+      const records = readJson(sharedStrategyCacheKey, []);
+      return Array.isArray(records) ? records : [];
+    }
+
+    function cacheStrategies(records) {
+      try {
+        localStorage.setItem(sharedStrategyCacheKey, JSON.stringify(records));
+      } catch (error) {
+        console.warn("Could not cache shared strategies.", error);
+      }
+    }
 
     async function signedUrl(bucket, path) {
       if (!path) return "";
@@ -171,7 +202,12 @@
       };
       const { data, error } = await client.from("strategies").upsert(payload).select().single();
       if (error) throw error;
-      return rowToStrategy(data);
+      const saved = await rowToStrategy(data);
+      const records = cachedStrategies();
+      cacheStrategies(records.some(item => item.id === saved.id)
+        ? records.map(item => item.id === saved.id ? saved : item)
+        : [...records, saved]);
+      return saved;
     }
 
     return {
@@ -179,6 +215,12 @@
       supportsProfileRecovery: true,
       get userId() { return user?.id || ""; },
       get profileId() { return activeProfileId; },
+      async loadCachedProfile() {
+        return readJson(sharedProfileCacheKey, null);
+      },
+      async loadCachedStrategies() {
+        return cachedStrategies();
+      },
       async initialize() {
         const { data: sessionData, error: sessionError } = await client.auth.getSession();
         if (sessionError) throw sessionError;
@@ -194,6 +236,7 @@
         if (error) throw error;
         const profile = await rowToProfile(data);
         activeProfileId = profile?.id || "";
+        cacheProfile(profile);
         if (profile) localStorage.setItem(profileStorageKey, JSON.stringify({ id: profile.id, name: profile.name, photo: "" }));
         return profile;
       },
@@ -247,13 +290,16 @@
           .single();
         if (error) throw error;
         const saved = await rowToProfile({ ...data, pin_ready: creating || Boolean(pin) || profile.pinReady });
+        cacheProfile(saved);
         localStorage.setItem(profileStorageKey, JSON.stringify({ id: saved.id, name: saved.name, photo: "" }));
         return saved;
       },
       async loadStrategies() {
         const { data, error } = await client.from("strategies").select("*").order("created_at", { ascending: true });
         if (error) throw error;
-        return Promise.all((data || []).map(rowToStrategy));
+        const records = await Promise.all((data || []).map(rowToStrategy));
+        cacheStrategies(records);
+        return records;
       },
       async migrateLocalStrategies(profile, normalize = records => records) {
         const marker = `squadbook.sharedMigration.${config.url}`;
@@ -279,6 +325,7 @@
         const { error } = await client.from("strategies").delete().eq("id", record.id);
         if (error) throw error;
         await Promise.all((record.references || []).map(reference => removeIfPresent("strategy-media", reference.path)));
+        cacheStrategies(cachedStrategies().filter(item => item.id !== record.id));
       },
       subscribe(onChange) {
         let timer = 0;

@@ -176,3 +176,11 @@
 - A full strategy and a reusable site detail have different match-time jobs. Strategies retain operators and checkpoints; site setups contain only a short title, type, and visual references.
 - Keeping both record types in the existing `strategies` table with an `entry_type` discriminator preserves the proven media, attribution, realtime, and editing paths without adding a parallel backend.
 - Bomb-site results should always render strategies first and site setups second as a denser visual grid, so small cams and tricks remain immediately visible without pretending to be round plans.
+
+## 2026-09-29 — Fast cached startup
+
+- Static map data should not wait behind authentication or a remote strategy query; start both paths together and render the catalog as soon as its cached files resolve.
+- Keep a small shared-data snapshot in local storage so repeat visits can render the last known profile, strategies, and setups immediately, then replace it after the authoritative Supabase refresh.
+- A first-run local-to-shared migration should only trigger a second remote strategy load when it actually imported records.
+- Setup type belongs to the setup as a whole. Per-photo tactical labels remain useful for mixed strategy galleries but are duplicate input for setup photo collections.
+- When HTML and a separately cached data adapter change together, version the adapter URL as well as the service-worker cache. Otherwise a new Add Setup UI can call an old save payload that omits `entry_type`, causing the database default to classify it as a strategy.

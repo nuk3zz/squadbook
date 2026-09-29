@@ -15,6 +15,7 @@ A mobile-first visual strategy playbook for Rainbow Six Siege squads. Pick a map
 - Creator and latest-editor profile attribution with compact avatars
 - Four-digit profile recovery across browsers and devices
 - Optional Supabase sharing, private media storage, and realtime refresh
+- Instant repeat startup from a local snapshot while shared data refreshes in the background
 - Installable iPhone/Android PWA with a standalone layout and lightweight offline shell
 
 Squadbook uses plain HTML, CSS, and JavaScript with no build step.

@@ -1,11 +1,11 @@
-const CACHE_NAME = "squadbook-shell-v2";
+const CACHE_NAME = "squadbook-shell-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./assets/icons/squadbook-192.png",
   "./assets/icons/squadbook-512.png",
-  "./assets/shared-store.js",
+  "./assets/shared-store.js?v=3",
   "./assets/vendor/supabase-2.117.1.min.js",
   "./data/map-metadata.json",
   "./data/bomb-sites.json"
@@ -34,12 +34,13 @@ self.addEventListener("fetch", event => {
 
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
-        .then(response => {
+      caches.match("./index.html").then(cached => {
+        const refreshed = fetch(request).then(response => {
           if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put("./index.html", response.clone()));
           return response;
-        })
-        .catch(() => caches.match("./index.html"))
+        }).catch(() => cached);
+        return cached || refreshed;
+      })
     );
     return;
   }

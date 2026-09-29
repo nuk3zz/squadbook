@@ -1009,7 +1009,7 @@
   </dialog>
 
   <script src="assets/vendor/supabase-2.117.1.min.js"></script>
-  <script src="assets/shared-store.js"></script>
+  <script src="assets/shared-store.js?v=3"></script>
   <script>
     let maps = [];
     let blueprintRequest = 0;
@@ -1276,7 +1276,9 @@
     }
 
     function newReference() {
-      const defaultLabel = referenceLabelsBySide[sideSelect.value]?.[0] || "Other";
+      const defaultLabel = editingEntryType === "setup"
+        ? (setupTypeSelect.value || "Other")
+        : (referenceLabelsBySide[sideSelect.value]?.[0] || "Other");
       return { id: crypto.randomUUID?.() || String(Date.now()), label: defaultLabel, note: "", image: "", path: "" };
     }
 
@@ -1305,9 +1307,11 @@
           </div>
           <input class="photo-input" type="file" accept="image/*" data-reference-upload>
           <input class="photo-input" type="file" accept="image/*" capture="environment" data-reference-camera>
-          <select class="reference-label-select" data-reference-label aria-label="Reference label">
-            ${labels.map(label => `<option value="${escapeHtml(label)}" ${reference.label === label ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
-          </select>
+          ${editingEntryType === "setup" ? "" : `
+            <select class="reference-label-select" data-reference-label aria-label="Reference label">
+              ${labels.map(label => `<option value="${escapeHtml(label)}" ${reference.label === label ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
+            </select>
+          `}
           <input class="profile-name-input" type="text" maxlength="90" value="${escapeHtml(reference.note)}" placeholder="Short note, angle, or instruction" data-reference-note>
           <div class="reference-editor-actions">
             <button class="secondary-button" type="button" data-reference-camera-button>Camera</button>
@@ -1729,7 +1733,11 @@
         setupType: editingEntryType === "setup" ? setupTypeSelect.value : "",
         operators: editingEntryType === "setup" ? [] : [...selectedOperators],
         steps: editingEntryType === "setup" ? [] : checkpointInputs.map(input => input.value.trim()).filter(Boolean),
-        references: pendingReferences.filter(reference => reference.image).map(reference => ({ ...reference, label: reference.label || "Other", note: reference.note.trim() })),
+        references: pendingReferences.filter(reference => reference.image).map(reference => ({
+          ...reference,
+          label: editingEntryType === "setup" ? setupTypeSelect.value : (reference.label || "Other"),
+          note: reference.note.trim()
+        })),
         previousReferences: strategyReferences(existing),
         createdAt: existing?.createdAt || Date.now(),
         updatedAt: Date.now()
@@ -1896,7 +1904,7 @@
         list.innerHTML = items.map((item, index) => `
           <button class="strategy-card" type="button" data-id="${item.id}">
             <span class="strategy-number">${String(index + 1).padStart(2, "0")}</span>
-            <span class="tag">Ready to run</span>
+            <span class="tag">Strategy</span>
             <h3>${escapeHtml(item.title)}</h3>
             <span class="mini-operators">${item.operators.slice(0, 5).map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}</span>
             <span class="card-foot">
@@ -1920,7 +1928,7 @@
                 ${photoCount > 1 ? `<span class="setup-photo-count">${photoCount} photos</span>` : ""}
               </span>
               <span class="setup-card-body">
-                <span class="setup-kind">${escapeHtml(item.setupType || "Other")}</span>
+                <span class="setup-kind">Setup · ${escapeHtml(item.setupType || "Other")}</span>
                 <strong>${escapeHtml(item.title)}</strong>
               </span>
             </button>
@@ -1949,6 +1957,7 @@
       const container = document.querySelector("#reference-media");
       const filters = document.querySelector("#reference-filters");
       const references = strategyReferences(item);
+      const isSetup = item.entryType === "setup";
       if (!references.length) {
         filters.replaceChildren();
         container.innerHTML = `<div class="media-slot reference-empty"><span class="media-label">No extra references</span></div>`;
@@ -1958,18 +1967,18 @@
       const usedLabels = [...new Set(references.map(reference => reference.label || "Other"))];
       const orderedLabels = configuredLabels.filter(label => usedLabels.includes(label)).concat(usedLabels.filter(label => !configuredLabels.includes(label)));
       if (activeReferenceFilter !== "All" && !usedLabels.includes(activeReferenceFilter)) activeReferenceFilter = "All";
-      filters.innerHTML = ["All", ...orderedLabels].map(label => `
+      filters.innerHTML = isSetup ? "" : ["All", ...orderedLabels].map(label => `
         <button class="reference-filter ${activeReferenceFilter === label ? "active" : ""}" type="button" data-reference-filter="${escapeHtml(label)}">${escapeHtml(label)}</button>
       `).join("");
       const numberedReferences = references.map((reference, index) => ({ reference, number: index + 1 }));
-      const visibleReferences = activeReferenceFilter === "All"
+      const visibleReferences = isSetup || activeReferenceFilter === "All"
         ? numberedReferences
         : numberedReferences.filter(item => item.reference.label === activeReferenceFilter);
       container.innerHTML = visibleReferences.map(({ reference, number }) => `
         <div class="reference-card">
-          <div class="media-slot small"><img src="${reference.image}" alt="${escapeHtml(reference.label || "Strategy reference")} ${number}"></div>
+          <div class="media-slot small"><img src="${reference.image}" alt="${escapeHtml(isSetup ? item.setupType || "Setup photo" : reference.label || "Strategy reference")} ${number}"></div>
           <span class="reference-index">${String(number).padStart(2, "0")}</span>
-          <span class="reference-tag">${escapeHtml(reference.label || "Other")}</span>
+          ${isSetup ? "" : `<span class="reference-tag">${escapeHtml(reference.label || "Other")}</span>`}
           ${reference.note ? `<p class="reference-note">${escapeHtml(reference.note)}</p>` : ""}
         </div>
       `).join("");
@@ -2068,8 +2077,37 @@
     sideSelect.addEventListener("change", renderStrategies);
 
     async function initialize() {
+      const catalogPromise = Promise.all([
+        fetch("data/map-metadata.json").then(response => response.json()),
+        fetch("data/bomb-sites.json").then(response => response.json())
+      ]);
+
       try {
         store = window.createSquadbookStore(await loadSharedConfig());
+        playerProfile = await store.loadCachedProfile?.() || null;
+        strategies = normalizeStrategies(await store.loadCachedStrategies?.() || []);
+      } catch (error) {
+        console.error(error);
+        store = window.createSquadbookLocalStore();
+        await store.initialize();
+        playerProfile = await store.loadProfile();
+        strategies = normalizeStrategies(await store.loadStrategies());
+      }
+      renderPlayerProfile();
+
+      try {
+        const [mapData, siteData] = await catalogPromise;
+        maps = mapData.maps.filter(map => !excludedMapIds.has(map.id));
+        sitesByMap = siteData;
+        populateMaps();
+        renderStrategies();
+        renderBlueprint();
+      } catch (error) {
+        console.error(error);
+        list.innerHTML = `<div class="empty">Map data could not be loaded.</div>`;
+      }
+
+      try {
         await store.initialize();
         setSyncStatus(
           store.mode,
@@ -2080,47 +2118,36 @@
         console.error(error);
         store = window.createSquadbookLocalStore();
         await store.initialize();
-        setSyncStatus("error", "Local fallback", "Shared connection failed; changes are stored on this device");
-      }
-
-      try {
         playerProfile = await store.loadProfile();
         strategies = normalizeStrategies(await store.loadStrategies());
-        if (store.mode === "shared" && playerProfile?.name) {
-          await store.migrateLocalStrategies(playerProfile, normalizeStrategies);
-          strategies = normalizeStrategies(await store.loadStrategies());
-        }
-        await refreshAvailableProfiles();
-      } catch (error) {
-        console.error(error);
-        playerProfile = null;
-        strategies = [];
+        setSyncStatus("error", "Local fallback", "Shared connection failed; changes are stored on this device");
+        renderPlayerProfile();
+        if (maps.length) renderStrategies();
       }
-      renderPlayerProfile();
 
       try {
-        const [mapResponse, siteResponse] = await Promise.all([
-          fetch("data/map-metadata.json"),
-          fetch("data/bomb-sites.json")
+        const [freshProfile, freshStrategies, freshProfiles] = await Promise.all([
+          store.loadProfile(),
+          store.loadStrategies(),
+          store.mode === "shared" ? store.listProfiles() : Promise.resolve([])
         ]);
-        const [mapData, siteData] = await Promise.all([
-          mapResponse.json(),
-          siteResponse.json()
-        ]);
-        maps = mapData.maps.filter(map => !excludedMapIds.has(map.id));
-        sitesByMap = siteData;
-        populateMaps();
-        renderStrategies();
-        renderBlueprint();
-        if (store.mode === "shared") {
-          unsubscribeFromStrategies();
-          unsubscribeFromStrategies = store.subscribe(() => reloadStrategies().catch(console.error));
+        playerProfile = freshProfile;
+        strategies = normalizeStrategies(freshStrategies);
+        availableProfiles = store.mode === "shared" ? freshProfiles : (playerProfile ? [playerProfile] : []);
+        if (store.mode === "shared" && playerProfile?.name) {
+          const imported = await store.migrateLocalStrategies(playerProfile, normalizeStrategies);
+          if (imported) strategies = normalizeStrategies(await store.loadStrategies());
         }
-        if (!playerProfile?.name || (store.supportsProfileRecovery && !playerProfile.pinReady)) openProfileEditor();
       } catch (error) {
         console.error(error);
-        list.innerHTML = `<div class="empty">Map data could not be loaded.</div>`;
       }
+      renderPlayerProfile();
+      if (maps.length) renderStrategies();
+      if (store.mode === "shared") {
+        unsubscribeFromStrategies();
+        unsubscribeFromStrategies = store.subscribe(() => reloadStrategies().catch(console.error));
+      }
+      if (!playerProfile?.name || (store.supportsProfileRecovery && !playerProfile.pinReady)) openProfileEditor();
     }
 
     initialize();
