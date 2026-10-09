@@ -1,0 +1,132 @@
+{
+  "bank": {
+    "src": "assets/maps/bank.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/bank",
+    "title": "Bank — Ubisoft"
+  },
+  "border": {
+    "src": "assets/maps/border.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/border",
+    "title": "Border — Ubisoft"
+  },
+  "chalet": {
+    "src": "assets/maps/chalet.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/chalet",
+    "title": "Chalet — Ubisoft"
+  },
+  "club": {
+    "src": "assets/maps/club.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/clubhouse",
+    "title": "Club House — Ubisoft"
+  },
+  "coastline": {
+    "src": "assets/maps/coastline.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/coastline",
+    "title": "Coastline — Ubisoft"
+  },
+  "casino": {
+    "src": "assets/maps/casino.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/calypso-casino",
+    "title": "Calypso Casino — Ubisoft"
+  },
+  "consulate": {
+    "src": "assets/maps/consulate.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/consulate",
+    "title": "Consulate — Ubisoft"
+  },
+  "emerald": {
+    "src": "assets/maps/emerald.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/emerald-plains",
+    "title": "Emerald Plains — Ubisoft"
+  },
+  "favela": {
+    "src": "assets/maps/favela.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/favela",
+    "title": "Favela — Ubisoft"
+  },
+  "fortress": {
+    "src": "assets/maps/fortress.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/fortress",
+    "title": "Fortress — Ubisoft"
+  },
+  "hereford": {
+    "src": "assets/maps/hereford.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/hereford-base",
+    "title": "Hereford Base — Ubisoft"
+  },
+  "house": {
+    "src": "assets/maps/house.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/house",
+    "title": "House — Ubisoft"
+  },
+  "kafe": {
+    "src": "assets/maps/kafe.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/kafe-dostoyevsky",
+    "title": "Kafe Dostoyevsky — Ubisoft"
+  },
+  "kanal": {
+    "src": "assets/maps/kanal.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/kanal",
+    "title": "Kanal — Ubisoft"
+  },
+  "lair": {
+    "src": "assets/maps/lair.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/lair",
+    "title": "Lair — Ubisoft"
+  },
+  "labs": {
+    "src": "assets/maps/labs.jpg",
+    "source": "https://news.ubisoft.com/en-gb/article/pL1Fr8QfKPFZIgMcePE09/rainbow-six-siege-operation-solar-raid-operator-and-gadget-guide",
+    "title": "Nighthaven Labs — Ubisoft"
+  },
+  "oregon": {
+    "src": "assets/maps/oregon.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/oregon",
+    "title": "Oregon — Ubisoft"
+  },
+  "outback": {
+    "src": "assets/maps/outback.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/outback",
+    "title": "Outback — Ubisoft"
+  },
+  "plane": {
+    "src": "assets/maps/plane.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/presidential-plane",
+    "title": "Presidential Plane — Ubisoft"
+  },
+  "skyscraper": {
+    "src": "assets/maps/skyscraper.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/skyscraper",
+    "title": "Skyscraper — Ubisoft"
+  },
+  "stadiumalpha": {
+    "src": "assets/maps/stadiumalpha.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/stadium-alpha",
+    "title": "Stadium Alpha — Ubisoft"
+  },
+  "stadiumbravo": {
+    "src": "assets/maps/stadiumbravo.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/stadium-bravo",
+    "title": "Stadium Bravo — Ubisoft"
+  },
+  "themepark": {
+    "src": "assets/maps/themepark.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/theme-park",
+    "title": "Theme Park — Ubisoft"
+  },
+  "tower": {
+    "src": "assets/maps/tower.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/tower",
+    "title": "Tower — Ubisoft"
+  },
+  "villa": {
+    "src": "assets/maps/villa.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/villa",
+    "title": "Villa — Ubisoft"
+  },
+  "yacht": {
+    "src": "assets/maps/yacht.jpg",
+    "source": "https://www.ubisoft.com/en-us/game/rainbow-six/siege/game-info/maps/yacht",
+    "title": "Yacht — Ubisoft"
+  }
+}

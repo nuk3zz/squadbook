@@ -456,6 +456,10 @@
     .setup-kind { color: var(--accent); font-size: .64rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .setup-card strong { overflow: hidden; font-size: .9rem; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
     .setup-grid .empty { grid-column: 1 / -1; }
+    .map-content { display: grid; gap: 28px; }
+    .side-tiles h2 { margin: 0 0 12px; }
+    .side-tiles h3.tile-section-title { margin: 20px 0 10px; color: var(--muted); font-size: .8rem; }
+    .tile-location { display: block; color: var(--muted); font-size: .75rem; line-height: 1.4; }
 
     .strategy-card {
       position: relative;
@@ -815,6 +819,95 @@
       .section-head { align-items: flex-start; }
       .section-head span { display: none; }
     }
+
+    /* Compact match-time browsing; editing controls keep their existing layout. */
+    .shell { padding-top: 16px; }
+    header { margin-bottom: 16px; }
+    .map-picker { margin: 0 0 12px; }
+    .map-grid { grid-template-rows: repeat(2, 74px); grid-auto-columns: 122px; gap: 7px; padding-bottom: 6px; }
+    .map-card img { opacity: .92; }
+    .round-controls { display: grid; gap: 9px; margin-bottom: 12px; }
+    .round-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .round-toolbar h1 { margin: 0; font-size: 1.2rem; letter-spacing: -.025em; }
+    .blueprint-link { border: 0; padding: 7px 0 7px 10px; background: none; color: var(--muted); font: inherit; font-size: .75rem; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+    .control-line { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .side-switch { display: flex; flex: 0 0 auto; gap: 3px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    .side-switch button, .floor-chip, .site-chip { border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--muted); font: inherit; font-size: .78rem; font-weight: 800; min-height: 36px; padding: 7px 11px; cursor: pointer; }
+    .side-switch button[aria-pressed="true"] { background: var(--accent); color: #101408; }
+    .side-switch button[data-side="defense"][aria-pressed="true"] { background: #7de3b0; }
+    .floor-chips { display: flex; gap: 3px; overflow-x: auto; scrollbar-width: none; }
+    .floor-chip { white-space: nowrap; padding: 7px 9px; }
+    .floor-chip[aria-pressed="true"] { border-color: #515c69; background: var(--panel-2); color: var(--text); }
+    .site-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .site-chip { border-color: var(--line); background: var(--panel); padding: 7px 10px; font-size: .73rem; }
+    .site-chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+    .site-chip small { color: #7f8995; margin-right: 4px; font-size: .65rem; }
+    .entry-section { margin-top: 14px; }
+    .section-head { align-items: center; margin: 0 0 8px; gap: 8px; }
+    .section-head h2 { font-size: .92rem; }
+    .section-head span { display: inline; font-size: .72rem; }
+    .section-actions { flex-direction: row; align-items: center; gap: 8px; }
+    .section-actions .primary-button { min-height: 36px; padding: 7px 10px; font-size: .76rem; border-radius: 10px; }
+    .setup-add { background: #7de3b0; color: #0c2418; }
+    .strategy-grid, .setup-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+    .match-card { display: flex; flex-direction: column; min-width: 0; position: relative; overflow: hidden; border: 1px solid rgba(220,255,69,.4); border-radius: 13px; padding: 0; background: var(--panel); color: var(--text); text-align: left; cursor: pointer; box-shadow: 0 0 14px rgba(220,255,69,.025); }
+    .match-card:hover, .match-card:focus-visible { border-color: var(--accent); outline: 2px solid rgba(220,255,69,.2); outline-offset: 2px; }
+    .match-card.setup { border-color: rgba(125,227,176,.4); box-shadow: 0 0 14px rgba(125,227,176,.025); }
+    .match-card.setup:hover, .match-card.setup:focus-visible { border-color: #7de3b0; outline-color: rgba(125,227,176,.2); }
+    .match-thumb { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; background: var(--panel-2); }
+    .match-thumb > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .match-thumb .strategy-number { z-index: 1; top: 5px; right: 7px; color: rgba(255,255,255,.24); font-size: 2.3rem; text-shadow: 0 1px 8px #000; pointer-events: none; }
+    .match-body { display: flex; flex-direction: column; flex: 1; gap: 5px; padding: 9px 10px 10px; }
+    .match-kind { font-size: .58rem; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .setup .match-kind { color: #7de3b0; }
+    .match-title { font-size: .88rem; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .match-card .tile-location { font-size: .65rem; line-height: 1.25; }
+    .match-card .mini-operators { margin: 1px 0 0; gap: 3px; flex-wrap: wrap; }
+    .match-card .mini-operators img { width: 22px; height: 22px; border-radius: 0; }
+    .match-credit { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: .6rem; margin-top: auto; padding-top: 2px; overflow: hidden; }
+    .match-credit .author-avatar { width: 15px; height: 15px; font-size: .4rem; flex-shrink: 0; }
+    .match-credit .byline { gap: 4px; flex-wrap: nowrap; }
+    .match-credit .author-stack { flex-shrink: 0; }
+    .match-credit > span:not(.author-stack) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .default-plan .match-thumb > img { opacity: .6; }
+    .draft-caption { position: absolute; left: 9px; bottom: 8px; color: var(--accent); font-size: .65rem; font-weight: 900; text-shadow: 0 1px 6px #000; }
+    .compact-empty { grid-column: 1 / -1; margin: 0; padding: 12px; border: 1px dashed var(--line); border-radius: 11px; color: var(--muted); font-size: .75rem; }
+    .blueprint-card.expanded { display: flex; flex-direction: column; height: 100dvh; }
+    .blueprint-card.expanded .blueprint-canvas { flex: 1; min-height: 0; height: auto; }
+    .blueprint-floor-chips { display: flex; gap: 3px; overflow-x: auto; }
+    .blueprint-floor-chips button { padding: 5px 8px; min-height: 32px; }
+    .detail-top { margin: 14px 0; gap: 10px; }
+    .detail h1 { font-size: clamp(1.65rem, 5vw, 3rem); margin-top: 7px; }
+    .back { padding: 7px 10px; font-size: .8rem; }
+    .media-grid { gap: 10px; }
+    @media (max-width: 760px) {
+      .shell { padding-top: 10px; }
+      header { margin-bottom: 12px; }
+      #header-avatar { display: grid; width: 28px; height: 28px; }
+      .map-grid { grid-template-rows: repeat(2, 63px); grid-auto-columns: 104px; gap: 6px; }
+      .map-picker-head { margin-bottom: 5px; }
+      .map-card span { font-size: .65rem; }
+      .map-picker { margin: 0 0 9px; }
+      .round-toolbar h1 { font-size: 1.05rem; }
+      .control-line { gap: 5px; }
+      .side-switch button { font-size: .75rem; padding: 7px 9px; }
+      .floor-chip { font-size: .73rem; padding: 7px; }
+      .site-chips { gap: 5px; }
+      .site-chip { flex: 1 1 calc(50% - 5px); text-align: left; min-height: 36px; padding: 7px 8px; font-size: .7rem; }
+      .site-chip[data-site="all"] { flex-basis: 100%; min-height: 30px; padding: 4px 8px; }
+      .strategy-grid, .setup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .match-body { padding: 8px; }
+      .match-title { font-size: .82rem; }
+      .entry-section { margin-top: 12px; }
+      .detail-top { margin: 12px 0; }
+      .detail-actions { gap: 7px; margin-top: 8px; }
+      .author-pill { margin-top: 0; border: 0; padding: 0; font-size: .62rem; }
+      .detail-actions .secondary-button { padding: 6px 9px; font-size: .72rem; }
+      .detail-path-row .eyebrow { font-size: .65rem; letter-spacing: .05em; }
+      .blueprint-toolbar { flex-wrap: wrap; gap: 5px 10px; }
+      .blueprint-floor-chips { order: 3; width: 100%; }
+      .blueprint-source { padding: 6px 10px; font-size: .62rem; }
+    }
   </style>
 </head>
 <body>
@@ -828,22 +921,18 @@
     </header>
 
     <section class="browse" id="browse">
-      <p class="eyebrow">Match playbook</p>
-      <h1>Pick the round.<br>Recall the plan.</h1>
-      <p class="subhead">Pick the round. Read the blueprint. Run the strat.</p>
-
       <section class="map-picker" aria-labelledby="map-picker-title">
         <div class="map-picker-head"><strong id="map-picker-title">Choose map</strong><span>Swipe for more</span></div>
         <div class="map-grid" id="map-grid"></div>
       </section>
 
-      <div class="selector">
+      <div class="selector" hidden>
         <div class="field">
           <label for="map">Map</label>
           <select id="map" aria-label="Map"></select>
         </div>
         <div class="field">
-          <label for="side">Side</label>
+          <label for="side">Adding to side</label>
           <select id="side">
             <option value="attack">Attack</option>
             <option value="defense">Defense</option>
@@ -859,11 +948,21 @@
         </div>
       </div>
 
+      <section class="round-controls" aria-label="Choose the round">
+        <div class="round-toolbar"><h1 id="selected-map-name">Club House</h1><button class="blueprint-link" id="home-blueprint-link" type="button">Blueprint ↗</button></div>
+        <div class="control-line">
+          <div class="side-switch" id="side-switch" aria-label="Side"><button type="button" data-side="attack" aria-pressed="true">Attack</button><button type="button" data-side="defense" aria-pressed="false">Defense</button></div>
+          <div class="floor-chips" id="floor-chips" aria-label="Filter floor"></div>
+        </div>
+        <div class="site-chips" id="site-chips" aria-label="Filter bomb site"></div>
+      </section>
+
       <div id="blueprint-home">
-        <section class="blueprint-card" id="blueprint-card" aria-label="Selected map blueprint">
+        <section class="blueprint-card" id="blueprint-card" aria-label="Selected map blueprint" hidden>
           <div class="blueprint-toolbar">
-            <div><span>Blueprint</span><strong id="blueprint-title">Club House · 2F</strong></div>
-            <button class="blueprint-expand" id="blueprint-expand" type="button">Expand</button>
+            <strong id="blueprint-title">Club House · 2F</strong>
+            <div class="blueprint-floor-chips" id="blueprint-floor-chips" aria-label="Blueprint floor"></div>
+            <button class="blueprint-expand" id="blueprint-expand" type="button">Close</button>
           </div>
           <div class="blueprint-canvas" id="blueprint-canvas">
             <div class="blueprint-loading">Loading blueprint…</div>
@@ -872,24 +971,24 @@
         </section>
       </div>
 
-      <div class="section-head">
-        <h2 id="result-title">2F CCTV / Cash · Attack</h2>
-        <div class="section-actions"><span id="result-count">0 strategies</span><button class="primary-button" id="add-strategy" type="button">+ Add strategy</button></div>
-      </div>
-
-      <div id="strategy-list" class="strategy-grid"></div>
-
-      <section class="setup-section">
+      <section class="entry-section" aria-labelledby="result-title">
         <div class="section-head">
-          <h2>Site setups</h2>
-          <div class="section-actions"><span id="setup-count">0 setups</span><button class="primary-button" id="add-setup" type="button">+ Add setup</button></div>
+          <h2 id="result-title">Strategies</h2>
+          <div class="section-actions"><span id="result-count">0</span><button class="primary-button" id="add-strategy" type="button">+ Strategy</button></div>
+        </div>
+        <div id="strategy-list" class="strategy-grid"></div>
+      </section>
+      <section class="entry-section" aria-labelledby="setups-title">
+        <div class="section-head">
+          <h2 id="setups-title">Site setups</h2>
+          <div class="section-actions"><span id="setup-count">0</span><button class="primary-button setup-add" id="add-setup" type="button">+ Setup</button></div>
         </div>
         <div id="setup-list" class="setup-grid"></div>
       </section>
     </section>
 
     <section class="detail" id="detail" aria-live="polite">
-      <button class="back" id="back" type="button">← Bomb site</button>
+      <button class="back" id="back" type="button">← Playbook</button>
       <div class="detail-top">
         <div>
           <div class="detail-path-row"><p class="eyebrow" id="detail-path">Strategy</p><button class="detail-blueprint-link" id="detail-blueprint-link" type="button">Blueprint</button></div>
@@ -1043,6 +1142,9 @@
     let selectedProfileId = "";
     let activeReferenceFilter = "All";
     let editingEntryType = "strategy";
+    let browseFloor = "all";
+    let browseSite = "all";
+    let blueprintReturnFocus = null;
     let store = null;
     let unsubscribeFromStrategies = () => {};
 
@@ -1396,13 +1498,11 @@
       setupTypeSelect.value = setupTypes.includes(item?.setupType) ? item.setupType : setupTypes[0];
       operatorSection.hidden = isSetup;
       checkpointSection.hidden = isSetup;
-      document.querySelector("#visual-reference-label").textContent = isSetup ? "Setup photos · add at least one" : "Visual references · optional";
-      strategyLocationSection.hidden = !item;
-      strategyLocationSection.open = false;
-      document.querySelector("#strategy-location-summary").textContent = `Wrong bomb site? Move ${isSetup ? "setup" : "strategy"}`;
-      if (item) {
-        strategyLocation.innerHTML = (sitesByMap[item.map] || []).map(site => `<option value="${site.id}" ${site.id === item.site ? "selected" : ""}>${escapeHtml(site.label)}</option>`).join("");
-      }
+      document.querySelector("#visual-reference-label").textContent = isSetup ? "Setup photos · add at least one" : "Photos · optional · first photo is thumbnail";
+      strategyLocationSection.hidden = false;
+      strategyLocationSection.open = !item;
+      document.querySelector("#strategy-location-summary").textContent = item ? `Wrong bomb site? Move ${isSetup ? "setup" : "strategy"}` : "Bomb site";
+      strategyLocation.innerHTML = (sitesByMap[item?.map || map.id] || []).map(site => `<option value="${site.id}" ${site.id === (item?.site || siteSelect.value) ? "selected" : ""}>${escapeHtml(site.label)}</option>`).join("");
       selectedOperators = isSetup ? [] : [...(item?.operators || [])];
       pendingReferences = strategyReferences(item).map(reference => ({ ...reference }));
       checkpointInputs.forEach((input, index) => input.value = isSetup ? "" : (item?.steps?.[index] || ""));
@@ -1714,9 +1814,7 @@
     strategyForm.addEventListener("submit", async event => {
       event.preventDefault();
       const existing = strategies.find(item => item.id === strategyId.value);
-      const movedSite = existing
-        ? (sitesByMap[existing.map] || []).find(site => site.id === strategyLocation.value)
-        : null;
+      const movedSite = (sitesByMap[existing?.map || mapSelect.value] || []).find(site => site.id === strategyLocation.value);
       const record = {
         ...existing,
         id: existing?.id || (crypto.randomUUID?.() || String(Date.now())),
@@ -1754,11 +1852,13 @@
         strategies = existing ? strategies.map(item => item.id === saved.id ? saved : item) : [...strategies, saved];
         activeStrategy = saved;
         strategyDialog.close();
-        if (existing && saved.site !== siteSelect.value) {
-          siteSelect.value = saved.site;
-          syncFloorToSite();
-          renderBlueprint();
+        siteSelect.value = saved.site;
+        syncFloorToSite();
+        if ((browseFloor !== "all" && browseFloor !== String(saved.floor)) || (browseSite !== "all" && browseSite !== saved.site)) {
+          browseFloor = "all";
+          browseSite = saved.site;
         }
+        renderBlueprint();
         renderStrategies();
         if (detail.classList.contains("active")) openStrategy(saved);
       } catch (error) {
@@ -1802,8 +1902,23 @@
       return `${floor}F`;
     }
 
-    function mapThumbnailFloor(map) {
-      return Math.max(map.minFloorNumber, map.maxFloorNumber - 1);
+    function mapPhoto(mapId) {
+      return `assets/maps/${mapId}.jpg`;
+    }
+
+    function renderRoundControls() {
+      const map = currentMap();
+      if (!map) return;
+      document.querySelector("#selected-map-name").textContent = map.name;
+      document.querySelectorAll("[data-side]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.side === sideSelect.value)));
+      const floorOptions = [...floorSelect.options];
+      document.querySelector("#floor-chips").innerHTML = [{ value: "all", textContent: "All" }, ...floorOptions].map(option => `<button class="floor-chip" type="button" data-floor="${option.value}" aria-pressed="${browseFloor === option.value}">${option.textContent}</button>`).join("");
+      const sites = (sitesByMap[map.id] || []).filter(site => browseFloor === "all" || String(site.floor) === browseFloor);
+      document.querySelector("#site-chips").innerHTML = `<button class="site-chip" type="button" data-site="all" aria-pressed="${browseSite === "all"}">All sites</button>` + sites.map(site => {
+        const label = site.label.replace(/^(?:SB|B|\dF)\s+/, "");
+        return `<button class="site-chip" type="button" data-site="${site.id}" aria-pressed="${browseSite === site.id}"><small>${floorLabel(map, site.floor)}</small>${escapeHtml(label)}</button>`;
+      }).join("");
+      document.querySelector("#blueprint-floor-chips").innerHTML = floorOptions.map(option => `<button class="floor-chip" type="button" data-blueprint-floor="${option.value}" aria-pressed="${floorSelect.value === option.value}">${option.textContent}</button>`).join("");
     }
 
     function syncMapPickerSelection() {
@@ -1815,7 +1930,7 @@
     function renderMapPicker() {
       mapGrid.innerHTML = maps.map(map => `
         <button class="map-card" type="button" data-map-id="${map.id}" aria-label="Choose ${escapeHtml(map.name)}" aria-pressed="${map.id === mapSelect.value}">
-          <img src="assets/blueprints/${map.id}/${mapThumbnailFloor(map)}.jpg" alt="" loading="lazy" decoding="async">
+          <img src="${mapPhoto(map.id)}" alt="" loading="lazy" decoding="async">
           <span>${escapeHtml(map.name)}</span>
         </button>
       `).join("");
@@ -1824,9 +1939,13 @@
     function selectMap(mapId) {
       if (!maps.some(map => map.id === mapId)) return;
       mapSelect.value = mapId;
+      browseFloor = "all";
+      browseSite = "all";
+      hideBlueprint();
       syncMapPickerSelection();
       populateFloors();
       populateSites();
+      renderRoundControls();
       renderBlueprint();
       renderStrategies();
     }
@@ -1837,6 +1956,7 @@
       renderMapPicker();
       populateFloors();
       populateSites();
+      renderRoundControls();
     }
 
     function populateFloors(preferredFloor) {
@@ -1857,10 +1977,12 @@
         siteSelect.innerHTML = `<option value="unavailable">No Bomb sites on this map</option>`;
         siteSelect.disabled = true;
         addStrategyButton.disabled = true;
+        addSetupButton.disabled = true;
         return;
       }
       siteSelect.disabled = false;
       addStrategyButton.disabled = false;
+      addSetupButton.disabled = false;
       siteSelect.innerHTML = sites.map(site => `<option value="${site.id}">${site.label}</option>`).join("");
       syncFloorToSite();
     }
@@ -1876,6 +1998,7 @@
       const selectedFloor = Number(floorSelect.value);
       const request = ++blueprintRequest;
       document.querySelector("#blueprint-title").textContent = `${map.name} · ${floorLabel(map, selectedFloor)}`;
+      if (blueprintCard.hidden) return;
       blueprintCanvas.innerHTML = `<div class="blueprint-loading">Loading ${map.name} blueprint…</div>`;
       const image = new Image();
       image.alt = `${map.name} ${floorLabel(map, selectedFloor)} blueprint`;
@@ -1890,57 +2013,54 @@
     }
 
     function renderStrategies() {
-      const siteItems = strategies.filter(item => item.map === mapSelect.value && item.side === sideSelect.value && item.site === siteSelect.value);
+      renderRoundControls();
+      const map = currentMap();
+      if (!map) return;
+      const sideItems = strategies.filter(item => item.map === map.id && item.side === sideSelect.value);
+      const siteItems = sideItems.filter(item => (browseFloor === "all" || String(item.floor) === browseFloor) && (browseSite === "all" || item.site === browseSite));
       const items = siteItems.filter(item => item.entryType !== "setup");
       const setups = siteItems.filter(item => item.entryType === "setup");
-      const sideLabel = sideSelect.value === "attack" ? "Attack" : "Defense";
-      document.querySelector("#result-title").textContent = `${siteLabel()} · ${sideLabel}`;
-      document.querySelector("#result-count").textContent = `${items.length} ${items.length === 1 ? "strategy" : "strategies"}`;
-      document.querySelector("#setup-count").textContent = `${setups.length} ${setups.length === 1 ? "setup" : "setups"}`;
+      document.querySelector("#result-title").textContent = "Strategies";
+      document.querySelector("#result-count").textContent = String(items.length);
+      document.querySelector("#setup-count").textContent = String(setups.length);
 
-      if (!items.length) {
-        list.innerHTML = `<div class="empty">No strategies here yet. Tap “Add strategy” to create the first one.</div>`;
-      } else {
-        list.innerHTML = items.map((item, index) => `
-          <button class="strategy-card" type="button" data-id="${item.id}">
+      const locationLabel = item => {
+        const site = (sitesByMap[item.map] || []).find(site => site.id === item.site);
+        return site?.label || `${floorLabel(currentMap(), item.floor)} · Bomb site`;
+      };
+      const card = (item, index, isSetup = false) => {
+        const references = strategyReferences(item);
+        const preview = references[0]?.image || mapPhoto(map.id);
+        return `<button class="match-card ${isSetup ? "setup" : "strat"}" type="button" data-id="${escapeHtml(item.id)}">
+          <span class="match-thumb"><img src="${escapeHtml(preview)}" alt="" loading="lazy" decoding="async">
             <span class="strategy-number">${String(index + 1).padStart(2, "0")}</span>
-            <span class="tag">Strategy</span>
-            <h3>${escapeHtml(item.title)}</h3>
-            <span class="mini-operators">${item.operators.slice(0, 5).map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}</span>
-            <span class="card-foot">
-              <span class="byline">${strategyCredit(item)}</span>
-              <span class="open">OPEN →</span>
-            </span>
-          </button>
-        `).join("");
-      }
+            ${references.length > 1 ? `<span class="setup-photo-count">${references.length} photos</span>` : ""}
+          </span>
+          <span class="match-body">
+            <span class="match-kind">${isSetup ? `Setup · ${escapeHtml(item.setupType || "Other")}` : "Strategy"}</span>
+            <strong class="match-title">${escapeHtml(item.title)}</strong>
+            <span class="tile-location">${escapeHtml(locationLabel(item))}</span>
+            ${!isSetup && item.operators.length ? `<span class="mini-operators">${item.operators.slice(0, 8).map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}${item.operators.length > 8 ? `<span>+${item.operators.length - 8}</span>` : ""}</span>` : ""}
+            ${!isSetup ? `<span class="match-credit">${strategyCredit(item)}</span>` : ""}
+          </span>
+        </button>`;
+      };
+      const hasAnyPlan = sideItems.some(item => item.entryType !== "setup");
+      const defaultTitle = `Default ${sideSelect.value === "attack" ? "attack" : "defense"} plan`;
+      list.innerHTML = items.map((item, index) => card(item, index)).join("") || (!hasAnyPlan && !siteSelect.disabled
+        ? `<button class="match-card strat default-plan" type="button" data-default-plan="true">
+            <span class="match-thumb"><img src="${mapPhoto(map.id)}" alt="" loading="lazy"><span class="draft-caption">+ Fill in the plan</span></span>
+            <span class="match-body"><span class="match-kind">Strategy · draft</span><strong class="match-title">${defaultTitle}</strong><span class="tile-location">Choose a site & add photos</span></span>
+          </button>`
+        : `<p class="compact-empty">No strategies here yet.</p>`);
+      setupList.innerHTML = setups.map((item, index) => card(item, index, true)).join("") || `<p class="compact-empty">No setups here yet. Add a cam, angle, or trick.</p>`;
 
-      if (!setups.length) {
-        setupList.innerHTML = `<div class="empty">No standalone setups yet. Add a cam, angle, gadget setup, or trick for this site.</div>`;
-      } else {
-        setupList.innerHTML = setups.map(item => {
-          const preview = strategyReferences(item)[0];
-          const photoCount = strategyReferences(item).length;
-          return `
-            <button class="setup-card" type="button" data-setup-id="${item.id}">
-              <span class="setup-thumb">
-                ${preview?.image ? `<img src="${preview.image}" alt="">` : "No photo"}
-                ${photoCount > 1 ? `<span class="setup-photo-count">${photoCount} photos</span>` : ""}
-              </span>
-              <span class="setup-card-body">
-                <span class="setup-kind">Setup · ${escapeHtml(item.setupType || "Other")}</span>
-                <strong>${escapeHtml(item.title)}</strong>
-              </span>
-            </button>
-          `;
-        }).join("");
-      }
-
-      list.querySelectorAll("[data-id]").forEach(button => {
-        button.addEventListener("click", () => openStrategy(items.find(item => item.id === button.dataset.id)));
+      [...list.querySelectorAll("[data-id]"), ...setupList.querySelectorAll("[data-id]")].forEach(button => {
+        button.addEventListener("click", () => openStrategy(siteItems.find(item => item.id === button.dataset.id)));
       });
-      setupList.querySelectorAll("[data-setup-id]").forEach(button => {
-        button.addEventListener("click", () => openStrategy(setups.find(item => item.id === button.dataset.setupId)));
+      list.querySelector("[data-default-plan]")?.addEventListener("click", () => {
+        openStrategyEditor();
+        if (strategyDialog.open) strategyTitle.value = defaultTitle;
       });
     }
 
@@ -1986,6 +2106,10 @@
 
     function openStrategy(item) {
       if (!item) return;
+      sideSelect.value = item.side;
+      siteSelect.value = item.site;
+      syncFloorToSite();
+      renderBlueprint();
       activeStrategy = item;
       const map = currentMap();
       const sideLabel = sideSelect.value === "attack" ? "Attack" : "Defense";
@@ -2001,30 +2125,21 @@
       document.querySelector("#steps").innerHTML = item.steps.map((step, index) => `
         <li><b>0${index + 1}</b>${escapeHtml(step)}</li>
       `).join("");
-      activeReferenceFilter = "All";
+      activeReferenceFilter = !isSetup && strategyReferences(item).some(reference => reference.label === "Plant Spot") ? "Plant Spot" : "All";
       renderStrategyReferences(item);
-      blueprintCard.classList.remove("expanded");
-      blueprintCard.classList.add("detail-collapsed");
+      hideBlueprint();
       detailBlueprintHome.classList.add("collapsed");
-      document.querySelector("#blueprint-expand").textContent = "Expand";
-      document.body.style.overflow = "";
-      resetBlueprintGesture();
-      detailBlueprintHome.append(blueprintCard);
       browse.classList.add("hidden");
       detail.classList.add("active");
       window.scrollTo({ top: 0, behavior: "instant" });
     }
 
     document.querySelector("#back").addEventListener("click", () => {
-      document.querySelector("#blueprint-home").append(blueprintCard);
-      blueprintCard.classList.remove("expanded", "detail-collapsed");
-      detailBlueprintHome.classList.remove("collapsed");
-      document.querySelector("#blueprint-expand").textContent = "Expand";
-      document.body.style.overflow = "";
-      resetBlueprintGesture();
+      hideBlueprint();
       detail.classList.remove("active");
       browse.classList.remove("hidden");
       activeStrategy = null;
+      renderStrategies();
     });
 
     document.querySelector("#reference-filters").addEventListener("click", event => {
@@ -2034,33 +2149,82 @@
       renderStrategyReferences(activeStrategy);
     });
 
-    document.querySelector("#detail-blueprint-link").addEventListener("click", () => {
-      if (!detail.classList.contains("active")) return;
-      blueprintCard.classList.remove("detail-collapsed");
-      detailBlueprintHome.classList.remove("collapsed");
+    function showBlueprint() {
+      blueprintReturnFocus = document.activeElement;
+      document.body.append(blueprintCard);
+      blueprintCard.hidden = false;
       blueprintCard.classList.add("expanded");
-      resetBlueprintGesture();
-      document.querySelector("#blueprint-expand").textContent = "Close";
+      blueprintCard.setAttribute("role", "dialog");
+      blueprintCard.setAttribute("aria-modal", "true");
       document.body.style.overflow = "hidden";
-    });
+      renderRoundControls();
+      renderBlueprint();
+      document.querySelector("#blueprint-expand").focus();
+    }
 
-    document.querySelector("#blueprint-expand").addEventListener("click", event => {
-      let expanded;
-      if (detail.classList.contains("active") && blueprintCard.classList.contains("detail-collapsed")) {
-        blueprintCard.classList.remove("detail-collapsed");
-        detailBlueprintHome.classList.remove("collapsed");
-        blueprintCard.classList.add("expanded");
-        expanded = true;
-      } else {
-        expanded = blueprintCard.classList.toggle("expanded");
-        if (!expanded && detail.classList.contains("active")) {
-          blueprintCard.classList.add("detail-collapsed");
-          detailBlueprintHome.classList.add("collapsed");
-        }
-      }
+    function hideBlueprint() {
+      const wasOpen = !blueprintCard.hidden;
+      blueprintCard.hidden = true;
+      blueprintCard.classList.remove("expanded", "detail-collapsed");
+      blueprintCard.removeAttribute("role");
+      blueprintCard.removeAttribute("aria-modal");
+      document.querySelector("#blueprint-home").append(blueprintCard);
+      document.body.style.overflow = "";
       resetBlueprintGesture();
-      event.currentTarget.textContent = expanded ? "Close" : "Expand";
-      document.body.style.overflow = expanded ? "hidden" : "";
+      if (wasOpen) blueprintReturnFocus?.focus();
+    }
+
+    document.querySelector("#detail-blueprint-link").addEventListener("click", showBlueprint);
+    document.querySelector("#home-blueprint-link").addEventListener("click", showBlueprint);
+    document.querySelector("#blueprint-expand").addEventListener("click", hideBlueprint);
+    blueprintCard.addEventListener("keydown", event => {
+      if (event.key === "Escape") { event.preventDefault(); hideBlueprint(); }
+      if (event.key !== "Tab") return;
+      const buttons = [...blueprintCard.querySelectorAll("button")];
+      const first = buttons[0], last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
+    document.querySelector("#blueprint-floor-chips").addEventListener("click", event => {
+      const button = event.target.closest("[data-blueprint-floor]");
+      if (!button) return;
+      floorSelect.value = button.dataset.blueprintFloor;
+      document.querySelectorAll("[data-blueprint-floor]").forEach(chip => chip.setAttribute("aria-pressed", String(chip === button)));
+      renderBlueprint();
+    });
+    document.querySelector("#side-switch").addEventListener("click", event => {
+      const button = event.target.closest("[data-side]");
+      if (!button) return;
+      sideSelect.value = button.dataset.side;
+      renderStrategies();
+    });
+    document.querySelector("#floor-chips").addEventListener("click", event => {
+      const button = event.target.closest("[data-floor]");
+      if (!button) return;
+      browseFloor = button.dataset.floor;
+      browseSite = "all";
+      if (browseFloor !== "all") {
+        floorSelect.value = browseFloor;
+        const site = (sitesByMap[mapSelect.value] || []).find(site => String(site.floor) === browseFloor);
+        if (site) siteSelect.value = site.id;
+      }
+      renderStrategies();
+    });
+    document.querySelector("#site-chips").addEventListener("click", event => {
+      const button = event.target.closest("[data-site]");
+      if (!button) return;
+      browseSite = button.dataset.site;
+      if (browseSite !== "all") {
+        siteSelect.value = browseSite;
+        syncFloorToSite();
+      }
+      renderStrategies();
+    });
+    strategyLocation.addEventListener("change", () => {
+      const existing = strategies.find(item => item.id === strategyId.value);
+      const map = maps.find(map => map.id === (existing?.map || mapSelect.value));
+      const site = (sitesByMap[map.id] || []).find(site => site.id === strategyLocation.value);
+      document.querySelector("#strategy-context").textContent = `${map.name} · ${site?.label || "Choose a site"} · ${(existing?.side || sideSelect.value) === "attack" ? "Attack" : "Defense"}`;
     });
 
     mapGrid.addEventListener("click", event => {

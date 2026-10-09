@@ -25,7 +25,7 @@ Status: complete.
 - Status: complete.
 - Completed first: mobile-first layout refinement and a Mac Mini LAN trial server.
 - Completed visual foundation: 26 squad-approved selectable maps, an automated compact blueprint exporter, and 81 locally stored operator icons. Bartlett University, Close Quarters, and District are intentionally excluded from the app.
-- Added a compact two-row photo picker for all supported maps on the homepage. It scrolls horizontally on phones and stays synchronized with the existing map dropdown.
+- The compact two-row homepage map picker uses authentic exterior photos. Attack/Defense buttons and floor/site chips replace the duplicate visible dropdowns; all sites are shown initially, with locations on each compact photo card.
 - Completed lightweight identity: each device creates a name-and-photo player profile with no email, password, or verification; tapping the header profile edits it.
 - Removed prototype player names and strategies so real squad content starts clean.
 - Completed strategy editor: add/edit/delete strategies, optionally select any number of side-specific operator icons including ban backups, enter four short checkpoints, and attach any number of generic photo-and-note references.
@@ -42,8 +42,8 @@ Optional gadget references were deliberately left out to keep the match-time too
 
 ## Visual-content decision
 
-- A selected floor blueprint appears above the strategy list and is carried into the opened strategy.
-- The homepage keeps the blueprint visible. Strategy detail hides the map card so screenshots are immediately visible and exposes only a tiny `Blueprint` text action beside the location; it opens the map full-screen and Close returns to the photo-first view.
+- Blueprint is hidden and unloaded by default on both the homepage and detail screen. A small `Blueprint` action opens the existing full-screen viewer with floor buttons; Close returns to the photo-first view.
+- Strategies and setups use two-column mobile photo cards with yellow and green borders respectively. The first reference is the card thumbnail, with a map-photo fallback for strategies. Empty map sides offer virtual default-plan drafts, persisted only after a player saves them.
 - Each floor is automatically cropped around the playable layout and exported as an 800 px JPEG.
 - One finger keeps scrolling the page normally; two fingers zoom and move the blueprint up to 4x on phones. Desktop blueprints fit fully at 1x, use Ctrl/Command plus wheel to zoom, and Ctrl/Command plus drag as a hand tool.
 - Roof layers are hidden from the match-time floor selector, and the embedded desktop blueprint is height-limited while Expand retains the large view.
