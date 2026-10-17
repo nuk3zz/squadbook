@@ -184,3 +184,15 @@
 - A first-run local-to-shared migration should only trigger a second remote strategy load when it actually imported records.
 - Setup type belongs to the setup as a whole. Per-photo tactical labels remain useful for mixed strategy galleries but are duplicate input for setup photo collections.
 - When HTML and a separately cached data adapter change together, version the adapter URL as well as the service-worker cache. Otherwise a new Add Setup UI can call an old save payload that omits `entry_type`, causing the database default to classify it as a strategy.
+
+## 2026-10-14 — Linux development recovery
+
+- Added `start-local.sh` using Bash and Python, binding the local preview to loopback. The existing macOS launcher remains available. HTTP 200 startup verified on Linux.
+
+## 2026-10-17 — Final source recovery checkpoint
+
+- Added `RESTORE.md` and canonical `knowledge/current-handoff.md` with platform setup, current features, verification limits, optional backlog, and separate source versus cloud/browser-data backup procedures.
+- Shared screenshot removal now follows successful database persistence; replacements get new paths. Database/upload failures preserve the saved media, and failed cleanup does not report a committed save as rejected. Six isolated failure/success checks cover this behavior.
+- SQL NULL must be rejected explicitly before negated regex/bcrypt checks. Updated the schema's three PIN functions and supplied a minimal existing-project migration; live application is still pending owner access.
+- Windows/Linux recovery launchers and all original history/assets are retained in the private recovery checkpoint. Python serves the app without a build; native Node runs offline checks. Private backup Actions are disabled to avoid deployment.
+- A Git backup does not contain Supabase records/Auth/media, GitHub secret values, or browser-local content. A repaired Mac can restore source independently, then reconnect the existing service rather than create a replacement squad.

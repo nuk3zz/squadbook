@@ -1,5 +1,7 @@
 # Siege Playbook — lean build plan
 
+Current checkpoint: [current-handoff.md](current-handoff.md), 17 October 2026. Stages 1–3 and static publishing are complete. Stage 4's owner-only data export/import, videos, real-match acceptance, and a custom domain remain optional follow-up work; they are not required for a fresh computer to run the app. A private source/history recovery backup is separate from a live cloud-data backup.
+
 ## Product definition
 
 A private, screenshot-led memory aid for a five-person Rainbow Six Siege squad. The match-time path is:
@@ -63,6 +65,8 @@ Optional gadget references were deliberately left out to keep the match-time too
 - Kept only `Added by` attribution in strategy records.
 
 ## Stage 4 — Media and backup
+
+Status: compressed image storage and server-side image limits complete. Video and owner-only export/import remain unimplemented; no owner administration role exists yet. Do not expose service-role credentials in the browser to implement a backup shortcut. Use the owner backup process in `RESTORE.md` until a separately designed admin backup exists.
 
 - Completed compressed shared image uploads for avatars, plant spots, and post-plant angles.
 - Add short-video uploads only if image references and external links prove insufficient.

@@ -174,13 +174,15 @@
       const storedReferences = [];
       for (const reference of record.references || []) {
         if (!reference.image) continue;
-        const path = reference.path || `${record.id}/references/${reference.id}.jpg`;
+        // Preserve the saved image until the database accepts its replacement.
+        const replacingImage = reference.path && reference.image.startsWith("data:");
+        const path = replacingImage
+          ? `${record.id}/references/${reference.id}-${crypto.randomUUID()}.jpg`
+          : reference.path || `${record.id}/references/${reference.id}.jpg`;
         await uploadDataUri("strategy-media", path, reference.image);
         storedReferences.push({ id: reference.id, label: reference.label || "Other", note: reference.note || "", path });
         priorPaths.delete(path);
       }
-      await Promise.all([...priorPaths].map(path => removeIfPresent("strategy-media", path)));
-
       const payload = {
         id: record.id,
         map_id: record.map,
@@ -202,6 +204,11 @@
       };
       const { data, error } = await client.from("strategies").upsert(payload).select().single();
       if (error) throw error;
+      // Cleanup is optional after a successful save. A failed cleanup must not
+      // report a committed edit as failed or remove media from an unsaved edit.
+      await Promise.all([...priorPaths].map(path =>
+        removeIfPresent("strategy-media", path).catch(error => console.warn("Could not remove unused strategy media.", error))
+      ));
       const saved = await rowToStrategy(data);
       const records = cachedStrategies();
       cacheStrategies(records.some(item => item.id === saved.id)

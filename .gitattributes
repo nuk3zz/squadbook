@@ -1,0 +1,3 @@
+# Keep launchers executable by native Unix shells after a Windows clone.
+*.sh text eol=lf
+*.command text eol=lf

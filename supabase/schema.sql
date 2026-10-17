@@ -150,8 +150,8 @@ declare
   clean_name text := btrim(p_display_name);
 begin
   if player_id is null then return jsonb_build_object('ok', false, 'error', 'not_signed_in'); end if;
-  if clean_name = '' or char_length(clean_name) > 24 then return jsonb_build_object('ok', false, 'error', 'invalid_name'); end if;
-  if p_pin !~ '^[0-9]{4}$' then return jsonb_build_object('ok', false, 'error', 'invalid_pin'); end if;
+  if clean_name is null or clean_name = '' or char_length(clean_name) > 24 then return jsonb_build_object('ok', false, 'error', 'invalid_name'); end if;
+  if p_pin is null or p_pin !~ '^[0-9]{4}$' then return jsonb_build_object('ok', false, 'error', 'invalid_pin'); end if;
   if public.current_profile_id() is not null then return jsonb_build_object('ok', false, 'error', 'profile_exists'); end if;
 
   perform pg_advisory_xact_lock(74427433);
@@ -175,7 +175,7 @@ as $$
 declare
   player_id uuid := public.current_profile_id();
 begin
-  if player_id is null or p_pin !~ '^[0-9]{4}$' then return false; end if;
+  if player_id is null or p_pin is null or p_pin !~ '^[0-9]{4}$' then return false; end if;
   update public.profiles
   set pin_hash = extensions.crypt(p_pin, extensions.gen_salt('bf'))
   where id = player_id;
@@ -196,7 +196,7 @@ declare
   blocked timestamptz;
 begin
   if session_id is null then return jsonb_build_object('ok', false, 'error', 'not_signed_in'); end if;
-  if p_pin !~ '^[0-9]{4}$' then return jsonb_build_object('ok', false, 'error', 'invalid_pin'); end if;
+  if p_pin is null or p_pin !~ '^[0-9]{4}$' then return jsonb_build_object('ok', false, 'error', 'invalid_pin'); end if;
 
   insert into public.profile_pin_attempts (user_id) values (session_id) on conflict do nothing;
   select attempts, blocked_until into attempt_count, blocked

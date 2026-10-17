@@ -1,5 +1,12 @@
 # Project instructions
 
+## Resume and recovery
+
+- Read `knowledge/current-handoff.md` and `RESTORE.md` before implementation or release. They record the current checkpoint, remaining live migration, verification limits, and recovery steps.
+- The private backup remote is `private-backup`; the public deployment remote is `origin`. Verify remote URLs before every push. GitHub Actions are disabled in the private repository. A push to public `origin/main` deploys production.
+- Keep credentials and real Supabase configuration outside Git, including the private backup. Cloud records/media and browser storage require separate backups.
+- Keep Windows, Linux, and macOS checkouts and native tools separate. Do not overwrite an existing dirty checkout during restoration.
+
 ## Product rule
 
 This is a private, lightweight Rainbow Six Siege visual playbook for a small friend group. Optimize every screen for quick recall during operator selection. Do not turn strategy entries into long-form guides.

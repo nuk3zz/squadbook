@@ -1,6 +1,10 @@
 # Connect Squadbook to Supabase
 
-The app is already prepared for shared mode. Do these steps once when the Supabase project is available.
+The app already has a deployed shared service. For a repaired/replacement computer, reconnect to that existing project using [RESTORE.md](RESTORE.md); do not create a replacement backend or reset the squad.
+
+For the existing project, the source checkpoint includes the pending `supabase/migrations/20261017_reject_null_pins.sql` migration. Apply that small migration using owner access as described in the handoff; its execution has not been verified here.
+
+The steps below are only for a deliberately new, empty Supabase project.
 
 1. Create a free project at <https://supabase.com/dashboard>.
 2. In Authentication settings, enable **Anonymous Sign-Ins**.

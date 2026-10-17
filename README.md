@@ -20,17 +20,29 @@ A mobile-first visual strategy playbook for Rainbow Six Siege squads. Pick a map
 
 Squadbook uses plain HTML, CSS, and JavaScript with no build step.
 
+**Resume or restore:** read [RESTORE.md](RESTORE.md), then the canonical [current handoff](knowledge/current-handoff.md). The private recovery repository is [nuk3zz/squadbook-private-backup](https://github.com/nuk3zz/squadbook-private-backup); its Actions are disabled. The public repository remains the production deployment source.
+
 ## Run locally
 
-Python 3 is the only requirement.
+Python 3 is the only requirement to run the app. Node.js is optional for the offline verification scripts.
 
 ```bash
 git clone https://github.com/nuk3zz/squadbook.git
 cd squadbook
-python3 -m http.server 4173 --directory dist
+python3 -m http.server 4173 --bind 127.0.0.1 --directory dist
 ```
 
-Open `http://127.0.0.1:4173` on the same computer. To use another device on the same local network, run `start-local.command` and open the address it prints. Do not expose or forward port 4173 on your router.
+On Windows, run `powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\start-local.ps1`. On Linux or macOS, run `bash ./start-local.sh`. These launchers bind to loopback. Open `http://127.0.0.1:4173` and stop with Ctrl+C.
+
+To use another device on the same trusted local network from a Mac, run `./start-local.command` and open the address it prints. That launcher intentionally binds to the LAN. Do not expose or forward port 4173 on your router.
+
+To verify without installing any npm packages:
+
+```text
+node scripts/check-project.mjs
+node scripts/check-match-ui.mjs
+node --test scripts/check-shared-store.mjs
+```
 
 ## Install on iPhone
 
