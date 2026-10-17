@@ -2,6 +2,8 @@
 
 Scope: Squadbook only. Windows checkout `C:\Projects\squadbook`. This is the canonical resume point; older stage plans and dated learnings are historical context. Read `../RESTORE.md` for fresh Windows/Linux/macOS setup and backup boundaries.
 
+Documentation follow-up, 18 October 2026: root README now includes a four-step mobile GIF and mobile/desktop screenshots in `docs/media/`. Captures use synthetic records in an ignored, isolated local copy; no production app data/source or shared backend changed. Refresh instructions and capture helpers are documented in `docs/media/README.md`. The pending backend migration and cloud-data backup below remain pending.
+
 ## Source and hosting
 
 - Local checkpoint branch: `recovery/20261017-final-checkpoint`, based on public `main` at `87b17f6e9db3efe7b87d0eab0ebb594d31a5901b`. The checkpoint commit is identified by `git log -1`; local receipt and remote verification are under `C:\Projects\_handoff\squadbook-final-20261017`.

@@ -196,3 +196,8 @@
 - SQL NULL must be rejected explicitly before negated regex/bcrypt checks. Updated the schema's three PIN functions and supplied a minimal existing-project migration; live application is still pending owner access.
 - Windows/Linux recovery launchers and all original history/assets are retained in the private recovery checkpoint. Python serves the app without a build; native Node runs offline checks. Private backup Actions are disabled to avoid deployment.
 - A Git backup does not contain Supabase records/Auth/media, GitHub secret values, or browser-local content. A repaired Mac can restore source independently, then reconnect the existing service rather than create a replacement squad.
+
+## 2026-10-18 — README visual demonstration
+
+- Added actual mobile/desktop app captures and a four-step GIF walkthrough with labeled synthetic demo content. Bundled map references illustrate the photo editor without exposing private squad uploads.
+- Documentation capture uses an ignored, separately served copy of `dist/`, with real shared config explicitly excluded. Demo data never enters the runtime catalog or a shared backend. Refresh instructions live in `docs/media/README.md`.

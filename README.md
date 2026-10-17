@@ -4,6 +4,29 @@ A mobile-first visual strategy playbook for Rainbow Six Siege squads. Pick a map
 
 **Live app:** [nuk3zz.github.io/squadbook](https://nuk3zz.github.io/squadbook/)
 
+## See it in action
+
+Choose a map, narrow down the Bomb site, and open a visual plan. Operator roles, short checkpoints, and an optional floor blueprint keep the reminder close at hand.
+
+<p align="center">
+  <img src="docs/media/walkthrough.gif" width="320" alt="Four-step Squadbook demo: choose Club House, filter CCTV/Cash, open a strategy, and view its floor blueprint.">
+</p>
+
+<details>
+<summary>View still screenshots — mobile and desktop</summary>
+
+| Browse a site | Review a strategy | Open the blueprint |
+| --- | --- | --- |
+| <img src="docs/media/mobile-browse.png" width="240" alt="Mobile playbook filtered to Club House CCTV/Cash, with a strategy and a separate drone setup."> | <img src="docs/media/mobile-strategy.png" width="240" alt="Mobile strategy showing a labeled reference image, operator lineup, and short round checkpoints."> | <img src="docs/media/mobile-blueprint.png" width="240" alt="Full-screen Club House floor blueprint with floor controls."> |
+
+**On a second monitor**
+
+![Desktop playbook with map photos, site filters, operator recommendations, and separate strategy/setup cards.](docs/media/desktop-overview.png)
+
+</details>
+
+*Real app captures using synthetic local demo records and bundled map references. Example plans and operator choices are illustrative; no private squad content is shown.*
+
 ## Features
 
 - 26 squad-approved maps and their Bomb-site definitions
