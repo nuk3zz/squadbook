@@ -52,19 +52,17 @@ alter table public.strategies add column if not exists editor_id uuid references
 alter table public.strategies add column if not exists editor_name text;
 alter table public.strategies add column if not exists entry_type text not null default 'strategy';
 alter table public.strategies add column if not exists setup_type text;
+alter table public.strategies add column if not exists applicable_sites text[] not null default '{}';
 
-do $$
-begin
-  if not exists (
-    select 1 from pg_constraint
-    where conrelid = 'public.strategies'::regclass
-      and conname = 'strategies_entry_type_check'
-  ) then
-    alter table public.strategies
-    add constraint strategies_entry_type_check check (entry_type in ('strategy', 'setup'));
-  end if;
-end;
-$$;
+alter table public.strategies drop constraint if exists strategies_entry_type_check;
+alter table public.strategies add constraint strategies_entry_type_check
+  check (entry_type in ('strategy', 'setup', 'power-spot'));
+alter table public.strategies drop constraint if exists strategies_power_spot_check;
+alter table public.strategies add constraint strategies_power_spot_check
+  check (entry_type <> 'power-spot' or (
+    side = 'defense' and cardinality(applicable_sites) > 0
+    and site_id = any(applicable_sites)
+  ));
 
 do $$
 declare operator_limit record;

@@ -98,7 +98,7 @@ const context = vm.createContext({
   Date,
 });
 vm.runInContext(`${source}\nglobalThis.harness = {
-  populateMaps, renderStrategies, openStrategyEditor,
+  populateMaps, renderStrategies, openStrategyEditor, openStrategy,
   seed(next) { maps = next.maps; sitesByMap = next.sites; strategies = normalizeStrategies(next.records); playerProfile = {id:'tester',name:'Tester'}; store = next.store; browseFloor = 'all'; browseSite = 'all'; },
   records() { return strategies; },
   references(next) { pendingReferences = next; },
@@ -193,3 +193,75 @@ assert.equal(saves.at(-1).editorId, 'tester', 'Edit records latest editor');
 assert.equal(api.records().length, 1, 'Edit replaces existing record');
 assert.equal(alerts.length, 0, 'All valid saves succeed without alerts');
 console.log('Passed: selected-side all-site results, side/floor/site filters, virtual default, new strategy/setup location, and edit/move identity. No shared storage or browser APIs used.');
+
+// Power Spots are distinct defense records, shared across selected bomb sites.
+assert.ok(html.indexOf('id="power-spots-section"') < html.indexOf('aria-labelledby="result-title"'), 'Power Spots precedes Strategies');
+await element('#side-switch').dispatch('click', sideButtons[1]);
+reseed([{ ...record('multi-site', 'basement', 0, 'defense', 'power-spot'), applicableSites: ['basement', 'upstairs'] },
+  record('single-site', 'basement', 0, 'defense', 'power-spot'),
+  record('invalid-attack', 'upstairs', 2, 'attack', 'power-spot')]);
+assert.deepEqual(ids('#power-spot-list'), ['multi-site', 'single-site']);
+assert.deepEqual(ids('#strategy-list'), [], 'Power Spots never appear as strategies');
+assert.ok(element('#strategy-list').innerHTML.includes('data-default-plan'), 'Power Spots do not suppress the strategy draft');
+assert.equal(element('#power-spots-section').hidden, false);
+assert.ok(element('#power-spot-list').innerHTML.includes('B Church / Arsenal · 2F CCTV / Cash'), 'Cards show all applicable sites');
+await clickChip('#floor-chips', 'floor', '2');
+assert.deepEqual(ids('#power-spot-list'), ['multi-site'], 'A secondary applicable floor includes the Power Spot');
+await clickChip('#site-chips', 'site', 'upstairs');
+assert.deepEqual(ids('#power-spot-list'), ['multi-site'], 'A secondary applicable site includes the Power Spot');
+await element('#side-switch').dispatch('click', sideButtons[0]);
+assert.equal(element('#power-spots-section').hidden, true);
+assert.deepEqual(ids('#power-spot-list'), [], 'Attack excludes even malformed attack Power Spots');
+element('#strategy-dialog').close();
+api.openStrategyEditor(null, 'power-spot');
+assert.equal(element('#strategy-dialog').open, false, 'Attack cannot open a Power Spot editor');
+await element('#side-switch').dispatch('click', sideButtons[1]);
+api.openStrategyEditor(null, 'power-spot');
+assert.equal(element('#power-spot-sites-section').hidden, false);
+assert.equal(element('#strategy-location-section').hidden, true);
+assert.equal(element('#strategy-form-title').textContent, 'Add Power Spot');
+element('#strategy-title').value = 'Shared hold';
+const togglePowerSite = async (id, checked) => {
+  const target = new Element();
+  target.dataset.powerSpotSite = id;
+  target.checked = checked;
+  await element('#power-spot-sites').dispatch('change', target);
+};
+await togglePowerSite('basement', true);
+await element('#strategy-form').dispatch('submit');
+const savedPowerSpot = saves.at(-1);
+assert.equal(savedPowerSpot.entryType, 'power-spot');
+assert.deepEqual(Array.from(savedPowerSpot.applicableSites), ['basement', 'upstairs']);
+assert.equal(savedPowerSpot.references.length, 0, 'Power Spots can start without photos');
+api.openStrategyEditor(savedPowerSpot);
+assert.ok(element('#power-spot-sites').innerHTML.includes('data-power-spot-site="upstairs" checked'), 'Editing restores multiple selections');
+await togglePowerSite('basement', false);
+await element('#strategy-form').dispatch('submit');
+assert.equal(saves.at(-1).site, 'upstairs');
+assert.equal(saves.at(-1).floor, 2);
+assert.deepEqual(Array.from(saves.at(-1).applicableSites), ['upstairs']);
+api.openStrategyEditor(saves.at(-1));
+await togglePowerSite('upstairs', false);
+const saveCount = saves.length;
+await element('#strategy-form').dispatch('submit');
+assert.equal(saves.length, saveCount, 'Empty applicability is rejected');
+assert.equal(alerts.at(-1), 'Select at least one defense bomb site for this Power Spot.');
+console.log('Passed: defense-only Power Spots, empty category, multi-site/floor filtering, applicability labels, editor save/edit, and empty-selection rejection.');
+
+reseed([
+  { ...record('Blue stairs hold', 'basement', 0, 'defense', 'power-spot'), applicableSites: ['basement', 'upstairs'],
+    references: [1, 2, 3].map(i => ({id: `stairs-${i}`, label: 'Power Spot', note: `Stairs angle ${i}`, image: `synthetic-stairs-${i}`})) },
+  { ...record('Garage rafters', 'basement', 0, 'defense', 'power-spot'), applicableSites: ['basement'],
+    references: [{id:'garage', label:'Power Spot', note:'Garage angle', image:'synthetic-garage'}] },
+]);
+assert.equal(ids('#power-spot-list').length, 2, 'A site can have multiple titled Power Spots');
+assert.ok(element('#power-spot-list').innerHTML.includes('Blue stairs hold'));
+assert.ok(element('#power-spot-list').innerHTML.includes('Garage rafters'));
+assert.ok(element('#power-spot-list').innerHTML.includes('3 photos'), 'Card shows the number of photos grouped under its title');
+api.openStrategy(api.records()[0]);
+assert.equal(element('#detail-title').textContent, 'Blue stairs hold');
+assert.equal((element('#reference-media').innerHTML.match(/class="reference-card"/g) || []).length, 3, 'All photos appear beneath the selected title');
+assert.ok(!element('#reference-media').innerHTML.includes('synthetic-garage'), 'Other Power Spot photos stay in their own title group');
+api.openStrategyEditor(api.records()[0]);
+assert.equal((element('#reference-editor-list').innerHTML.match(/class="reference-editor"/g) || []).length, 3, 'Editor restores every photo for this title');
+console.log('Passed: multiple titled Power Spots per site, multi-photo title groups, gallery separation, and editing multiple photos.');

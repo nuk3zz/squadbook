@@ -201,3 +201,13 @@
 
 - Added actual mobile/desktop app captures and a four-step GIF walkthrough with labeled synthetic demo content. Bundled map references illustrate the photo editor without exposing private squad uploads.
 - Documentation capture uses an ignored, separately served copy of `dist/`, with real shared config explicitly excluded. Demo data never enters the runtime catalog or a shared backend. Refresh instructions live in `docs/media/README.md`.
+
+## 26 October 2026 — defense Power Spots
+
+- Added an empty Defense-only Power Spots section before Strategies, matching the existing interface. Every spot has a title, multiple optional photos/notes, and one or more applicable bomb sites; multiple titles can share a site.
+- Filter applicability through catalog sites, including secondary floors/sites, rather than relying on the record's compatibility site/floor. Keep Power Spots out of the strategy draft/count and Attack.
+- Preserve the entry type and applicability through shared adapter saves/cache. Existing strategy/setup payloads omit the new column so they still work before migration. Prepared `supabase/migrations/20261026_power_spots.sql`; no live database changes or deployment performed.
+- Verified project checks, expanded UI harness (including title/photo grouping and edit behavior), eight shared adapter tests, and isolated browser QA at 1440/768/390 with multi-photo save/reload/detail/edit. Screenshots and synthetic runner are under ignored `work/power-spots/`.
+- See `knowledge/power-spots.md` and source request `raw/2026-10-26-power-spots.md`.
+
+Deployment follow-up, 26 October 2026: user authorized publishing to the existing GitHub Pages URL. Owner-authenticated Supabase SQL editor applied the Power Spots migration; information_schema confirmed the non-null array column. No strategy/media records were changed by the migration.

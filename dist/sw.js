@@ -1,11 +1,11 @@
-const CACHE_NAME = "squadbook-shell-v5";
+const CACHE_NAME = "squadbook-shell-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./assets/icons/squadbook-192.png",
   "./assets/icons/squadbook-512.png",
-  "./assets/shared-store.js?v=4",
+  "./assets/shared-store.js?v=5",
   "./assets/vendor/supabase-2.117.1.min.js",
   "./data/map-metadata.json",
   "./data/bomb-sites.json"

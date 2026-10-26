@@ -721,6 +721,9 @@
     .strategy-form { padding: 24px; }
     .strategy-form-head { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
     .strategy-form-head h2 { margin-bottom: 5px; }
+    .power-spot-sites { display: grid; gap: 4px; margin-top: 8px; }
+    .power-spot-site { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: .9rem; cursor: pointer; }
+    #power-spot-sites-section { margin-inline: 0; border: 0; padding-inline: 0; }
     .strategy-context { margin: 0; color: var(--muted); font-size: .85rem; }
     .editor-section { margin-top: 22px; }
     details.editor-section > summary { cursor: pointer; }
@@ -971,6 +974,13 @@
         </section>
       </div>
 
+      <section class="entry-section" id="power-spots-section" aria-labelledby="power-spots-title" hidden>
+        <div class="section-head">
+          <h2 id="power-spots-title">Power Spots</h2>
+          <div class="section-actions"><span id="power-spot-count">0</span><button class="primary-button" id="add-power-spot" type="button">+ Power Spot</button></div>
+        </div>
+        <div id="power-spot-list" class="setup-grid"></div>
+      </section>
       <section class="entry-section" aria-labelledby="result-title">
         <div class="section-head">
           <h2 id="result-title">Strategies</h2>
@@ -1073,6 +1083,12 @@
         <select id="setup-type" aria-label="Setup type"></select>
       </div>
 
+      <fieldset class="editor-section" id="power-spot-sites-section" hidden>
+        <legend class="editor-label">Applies to bomb sites</legend>
+        <p class="strategy-context">Select one or more sites.</p>
+        <div id="power-spot-sites" class="power-spot-sites"></div>
+      </fieldset>
+
       <details class="move-strategy" id="strategy-location-section" hidden>
         <summary id="strategy-location-summary">Wrong bomb site? Move strategy</summary>
         <select id="strategy-location" aria-label="Move strategy to bomb site"></select>
@@ -1108,7 +1124,7 @@
   </dialog>
 
   <script src="assets/vendor/supabase-2.117.1.min.js"></script>
-  <script src="assets/shared-store.js?v=4"></script>
+  <script src="assets/shared-store.js?v=5"></script>
   <script>
     let maps = [];
     let blueprintRequest = 0;
@@ -1142,6 +1158,7 @@
     let selectedProfileId = "";
     let activeReferenceFilter = "All";
     let editingEntryType = "strategy";
+    let selectedPowerSpotSites = [];
     let browseFloor = "all";
     let browseSite = "all";
     let blueprintReturnFocus = null;
@@ -1398,7 +1415,7 @@
       if (!pendingReferences.length) {
         referenceEditorList.innerHTML = `<div class="empty">${editingEntryType === "setup"
           ? "Add the screenshots and short notes that belong to this setup."
-          : "Add only the screenshots this strategy needs."}</div>`;
+          : "Add only the screenshots this entry needs."}</div>`;
         return;
       }
       const labels = referenceLabelsBySide[sideSelect.value] || referenceLabelsBySide.attack;
@@ -1409,7 +1426,7 @@
           </div>
           <input class="photo-input" type="file" accept="image/*" data-reference-upload>
           <input class="photo-input" type="file" accept="image/*" capture="environment" data-reference-camera>
-          ${editingEntryType === "setup" ? "" : `
+          ${editingEntryType !== "strategy" ? "" : `
             <select class="reference-label-select" data-reference-label aria-label="Reference label">
               ${labels.map(label => `<option value="${escapeHtml(label)}" ${reference.label === label ? "selected" : ""}>${escapeHtml(label)}</option>`).join("")}
             </select>
@@ -1452,7 +1469,8 @@
     function normalizeStrategies(records) {
       return records.map(strategy => ({
         ...strategy,
-        entryType: strategy.entryType === "setup" ? "setup" : "strategy",
+        entryType: ["setup", "power-spot"].includes(strategy.entryType) ? strategy.entryType : "strategy",
+        applicableSites: [...new Set((Array.isArray(strategy.applicableSites) && strategy.applicableSites.length ? strategy.applicableSites : [strategy.site]).map(id => strategy.map === "club" ? (legacyClubSiteIds[id] || id) : id))],
         setupType: strategy.setupType || "",
         operators: Array.isArray(strategy.operators) ? strategy.operators : [],
         steps: Array.isArray(strategy.steps) ? strategy.steps : [],
@@ -1486,31 +1504,40 @@
       }
       const map = currentMap();
       if (!map || siteSelect.disabled) return;
-      editingEntryType = item?.entryType === "setup" || requestedType === "setup" ? "setup" : "strategy";
-      const isSetup = editingEntryType === "setup";
+      editingEntryType = item?.entryType || requestedType;
+      if (!["strategy", "setup", "power-spot"].includes(editingEntryType)) editingEntryType = "strategy";
+      const isPowerSpot = editingEntryType === "power-spot";
+      if (isPowerSpot && (item?.side || sideSelect.value) !== "defense") return;
+      const isSetup = editingEntryType !== "strategy";
+      const entryLabel = isPowerSpot ? "Power Spot" : isSetup ? "setup" : "strategy";
+      document.querySelector("#power-spot-sites-section").hidden = !isPowerSpot;
+      selectedPowerSpotSites = [...(item?.applicableSites || [item?.site || siteSelect.value])];
+      document.querySelector("#power-spot-sites").innerHTML = (sitesByMap[item?.map || map.id] || []).map(site => `
+        <label class="power-spot-site"><input type="checkbox" data-power-spot-site="${escapeHtml(site.id)}" ${selectedPowerSpotSites.includes(site.id) ? "checked" : ""}>${escapeHtml(site.label)}</label>
+      `).join("");
       strategyId.value = item?.id || "";
       strategyTitle.value = item?.title || "";
-      strategyTitle.previousElementSibling.textContent = isSetup ? "Setup name" : "Strategy name";
-      strategyTitle.placeholder = isSetup ? "Example: Valk cam on square" : "Example: Garage take";
-      setupTypeSection.hidden = !isSetup;
+      strategyTitle.previousElementSibling.textContent = isPowerSpot ? "Power Spot title" : isSetup ? "Setup name" : "Strategy name";
+      strategyTitle.placeholder = isPowerSpot ? "Example: Blue stairs hold" : isSetup ? "Example: Valk cam on square" : "Example: Garage take";
+      setupTypeSection.hidden = !isSetup || isPowerSpot;
       const setupTypes = setupTypesBySide[item?.side || sideSelect.value] || setupTypesBySide.attack;
       setupTypeSelect.innerHTML = setupTypes.map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join("");
       setupTypeSelect.value = setupTypes.includes(item?.setupType) ? item.setupType : setupTypes[0];
       operatorSection.hidden = isSetup;
       checkpointSection.hidden = isSetup;
-      document.querySelector("#visual-reference-label").textContent = isSetup ? "Setup photos · add at least one" : "Photos · optional · first photo is thumbnail";
-      strategyLocationSection.hidden = false;
+      document.querySelector("#visual-reference-label").textContent = isPowerSpot ? "Power Spot photos · optional" : isSetup ? "Setup photos · add at least one" : "Photos · optional · first photo is thumbnail";
+      strategyLocationSection.hidden = isPowerSpot;
       strategyLocationSection.open = !item;
-      document.querySelector("#strategy-location-summary").textContent = item ? `Wrong bomb site? Move ${isSetup ? "setup" : "strategy"}` : "Bomb site";
+      document.querySelector("#strategy-location-summary").textContent = item ? `Wrong bomb site? Move ${entryLabel}` : "Bomb site";
       strategyLocation.innerHTML = (sitesByMap[item?.map || map.id] || []).map(site => `<option value="${site.id}" ${site.id === (item?.site || siteSelect.value) ? "selected" : ""}>${escapeHtml(site.label)}</option>`).join("");
       selectedOperators = isSetup ? [] : [...(item?.operators || [])];
       pendingReferences = strategyReferences(item).map(reference => ({ ...reference }));
       checkpointInputs.forEach((input, index) => input.value = isSetup ? "" : (item?.steps?.[index] || ""));
-      document.querySelector("#strategy-form-title").textContent = `${item ? "Edit" : "Add"} ${isSetup ? "setup" : "strategy"}`;
-      document.querySelector("#strategy-context").textContent = `${map.name} · ${siteLabel()} · ${sideSelect.value === "attack" ? "Attack" : "Defense"}`;
+      document.querySelector("#strategy-form-title").textContent = `${item ? "Edit" : "Add"} ${entryLabel}`;
+      document.querySelector("#strategy-context").textContent = isPowerSpot ? `${map.name} · Defense` : `${map.name} · ${siteLabel()} · ${sideSelect.value === "attack" ? "Attack" : "Defense"}`;
       document.querySelector("#delete-strategy").hidden = !item;
-      document.querySelector("#delete-strategy").textContent = `Delete ${isSetup ? "setup" : "strategy"}`;
-      document.querySelector("#strategy-save").textContent = `Save ${isSetup ? "setup" : "strategy"}`;
+      document.querySelector("#delete-strategy").textContent = `Delete ${entryLabel}`;
+      document.querySelector("#strategy-save").textContent = `Save ${entryLabel}`;
       operatorSection.open = selectedOperators.length > 0;
       renderOperatorPicker();
       renderReferenceEditors();
@@ -1746,6 +1773,12 @@
     });
 
     addStrategyButton.addEventListener("click", () => openStrategyEditor());
+    document.querySelector("#add-power-spot").addEventListener("click", () => openStrategyEditor(null, "power-spot"));
+    document.querySelector("#power-spot-sites").addEventListener("change", event => {
+      const id = event.target.dataset.powerSpotSite;
+      if (!id) return;
+      selectedPowerSpotSites = event.target.checked ? [...new Set([...selectedPowerSpotSites, id])] : selectedPowerSpotSites.filter(site => site !== id);
+    });
     addSetupButton.addEventListener("click", () => openStrategyEditor(null, "setup"));
     editStrategyButton.addEventListener("click", () => activeStrategy && openStrategyEditor(activeStrategy));
     document.querySelector("#strategy-close").addEventListener("click", () => strategyDialog.close());
@@ -1814,7 +1847,13 @@
     strategyForm.addEventListener("submit", async event => {
       event.preventDefault();
       const existing = strategies.find(item => item.id === strategyId.value);
-      const movedSite = (sitesByMap[existing?.map || mapSelect.value] || []).find(site => site.id === strategyLocation.value);
+      const isPowerSpot = editingEntryType === "power-spot";
+      const applicableSites = (sitesByMap[existing?.map || mapSelect.value] || []).filter(site => selectedPowerSpotSites.includes(site.id));
+      if (isPowerSpot && ((existing?.side || sideSelect.value) !== "defense" || !applicableSites.length)) {
+        alert("Select at least one defense bomb site for this Power Spot.");
+        return;
+      }
+      const movedSite = isPowerSpot ? applicableSites[0] : (sitesByMap[existing?.map || mapSelect.value] || []).find(site => site.id === strategyLocation.value);
       const record = {
         ...existing,
         id: existing?.id || (crypto.randomUUID?.() || String(Date.now())),
@@ -1828,12 +1867,13 @@
         editor: existing ? playerProfile.name : "",
         editorId: existing ? playerProfile.id : "",
         entryType: editingEntryType,
+        applicableSites: isPowerSpot ? applicableSites.map(site => site.id) : [],
         setupType: editingEntryType === "setup" ? setupTypeSelect.value : "",
-        operators: editingEntryType === "setup" ? [] : [...selectedOperators],
-        steps: editingEntryType === "setup" ? [] : checkpointInputs.map(input => input.value.trim()).filter(Boolean),
+        operators: editingEntryType !== "strategy" ? [] : [...selectedOperators],
+        steps: editingEntryType !== "strategy" ? [] : checkpointInputs.map(input => input.value.trim()).filter(Boolean),
         references: pendingReferences.filter(reference => reference.image).map(reference => ({
           ...reference,
-          label: editingEntryType === "setup" ? setupTypeSelect.value : (reference.label || "Other"),
+          label: isPowerSpot ? "Power Spot" : editingEntryType === "setup" ? setupTypeSelect.value : (reference.label || "Other"),
           note: reference.note.trim()
         })),
         previousReferences: strategyReferences(existing),
@@ -2017,14 +2057,22 @@
       const map = currentMap();
       if (!map) return;
       const sideItems = strategies.filter(item => item.map === map.id && item.side === sideSelect.value);
-      const siteItems = sideItems.filter(item => (browseFloor === "all" || String(item.floor) === browseFloor) && (browseSite === "all" || item.site === browseSite));
-      const items = siteItems.filter(item => item.entryType !== "setup");
+      const siteItems = sideItems.filter(item => {
+        if (item.entryType !== "power-spot") return (browseFloor === "all" || String(item.floor) === browseFloor) && (browseSite === "all" || item.site === browseSite);
+        return item.side === "defense" && (sitesByMap[item.map] || []).some(site => item.applicableSites.includes(site.id) && (browseFloor === "all" || String(site.floor) === browseFloor) && (browseSite === "all" || site.id === browseSite));
+      });
+      document.querySelector("#power-spots-section").hidden = sideSelect.value !== "defense";
+      document.querySelector("#add-power-spot").disabled = siteSelect.disabled;
+      const powerSpots = siteItems.filter(item => item.entryType === "power-spot");
+      document.querySelector("#power-spot-count").textContent = String(powerSpots.length);
+      const items = siteItems.filter(item => item.entryType === "strategy");
       const setups = siteItems.filter(item => item.entryType === "setup");
       document.querySelector("#result-title").textContent = "Strategies";
       document.querySelector("#result-count").textContent = String(items.length);
       document.querySelector("#setup-count").textContent = String(setups.length);
 
       const locationLabel = item => {
+        if (item.entryType === "power-spot") return powerSpotLocation(item);
         const site = (sitesByMap[item.map] || []).find(site => site.id === item.site);
         return site?.label || `${floorLabel(currentMap(), item.floor)} · Bomb site`;
       };
@@ -2037,7 +2085,7 @@
             ${references.length > 1 ? `<span class="setup-photo-count">${references.length} photos</span>` : ""}
           </span>
           <span class="match-body">
-            <span class="match-kind">${isSetup ? `Setup · ${escapeHtml(item.setupType || "Other")}` : "Strategy"}</span>
+            <span class="match-kind">${item.entryType === "power-spot" ? "Power Spot" : isSetup ? `Setup · ${escapeHtml(item.setupType || "Other")}` : "Strategy"}</span>
             <strong class="match-title">${escapeHtml(item.title)}</strong>
             <span class="tile-location">${escapeHtml(locationLabel(item))}</span>
             ${!isSetup && item.operators.length ? `<span class="mini-operators">${item.operators.slice(0, 8).map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}${item.operators.length > 8 ? `<span>+${item.operators.length - 8}</span>` : ""}</span>` : ""}
@@ -2045,7 +2093,7 @@
           </span>
         </button>`;
       };
-      const hasAnyPlan = sideItems.some(item => item.entryType !== "setup");
+      const hasAnyPlan = sideItems.some(item => item.entryType === "strategy");
       const defaultTitle = `Default ${sideSelect.value === "attack" ? "attack" : "defense"} plan`;
       list.innerHTML = items.map((item, index) => card(item, index)).join("") || (!hasAnyPlan && !siteSelect.disabled
         ? `<button class="match-card strat default-plan" type="button" data-default-plan="true">
@@ -2053,15 +2101,21 @@
             <span class="match-body"><span class="match-kind">Strategy · draft</span><strong class="match-title">${defaultTitle}</strong><span class="tile-location">Choose a site & add photos</span></span>
           </button>`
         : `<p class="compact-empty">No strategies here yet.</p>`);
+      const powerSpotList = document.querySelector("#power-spot-list");
+      powerSpotList.innerHTML = powerSpots.map((item, index) => card(item, index, true)).join("") || `<p class="compact-empty">No Power Spots here yet.</p>`;
       setupList.innerHTML = setups.map((item, index) => card(item, index, true)).join("") || `<p class="compact-empty">No setups here yet. Add a cam, angle, or trick.</p>`;
 
-      [...list.querySelectorAll("[data-id]"), ...setupList.querySelectorAll("[data-id]")].forEach(button => {
+      [...list.querySelectorAll("[data-id]"), ...setupList.querySelectorAll("[data-id]"), ...powerSpotList.querySelectorAll("[data-id]")].forEach(button => {
         button.addEventListener("click", () => openStrategy(siteItems.find(item => item.id === button.dataset.id)));
       });
       list.querySelector("[data-default-plan]")?.addEventListener("click", () => {
         openStrategyEditor();
         if (strategyDialog.open) strategyTitle.value = defaultTitle;
       });
+    }
+
+    function powerSpotLocation(item) {
+      return (sitesByMap[item.map] || []).filter(site => (item.applicableSites || [item.site]).includes(site.id)).map(site => site.label).join(" · ");
     }
 
     function operatorName(slug) {
@@ -2077,7 +2131,7 @@
       const container = document.querySelector("#reference-media");
       const filters = document.querySelector("#reference-filters");
       const references = strategyReferences(item);
-      const isSetup = item.entryType === "setup";
+      const isSetup = item.entryType !== "strategy";
       if (!references.length) {
         filters.replaceChildren();
         container.innerHTML = `<div class="media-slot reference-empty"><span class="media-label">No extra references</span></div>`;
@@ -2113,8 +2167,8 @@
       activeStrategy = item;
       const map = currentMap();
       const sideLabel = sideSelect.value === "attack" ? "Attack" : "Defense";
-      const isSetup = item.entryType === "setup";
-      document.querySelector("#detail-path").textContent = `${isSetup ? `${item.setupType || "Site setup"} · ` : ""}${map.name} · ${siteLabel()} · ${sideLabel}`;
+      const isSetup = item.entryType !== "strategy";
+      document.querySelector("#detail-path").textContent = `${isSetup ? `${item.entryType === "power-spot" ? "Power Spot" : item.setupType || "Site setup"} · ` : ""}${map.name} · ${item.entryType === "power-spot" ? powerSpotLocation(item) : siteLabel()} · ${sideLabel}`;
       document.querySelector("#detail-title").textContent = item.title;
       document.querySelector("#detail-credit").innerHTML = strategyCredit(item);
       document.querySelector("#operator-panel").hidden = isSetup || !item.operators.length;

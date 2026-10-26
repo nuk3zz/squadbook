@@ -109,3 +109,19 @@ test('metadata-only edits keep the existing media without upload or deletion', a
   assert.equal(saved.references[0].path, oldPath);
   assert.deepEqual(h.calls.map(([kind]) => kind), ['save']);
 });
+
+test('Power Spots preserve multiple applicable sites through shared save and cache', async () => {
+  const h = harness();
+  const saved = await h.store.saveStrategy({ ...record, side: 'defense', entryType: 'power-spot', applicableSites: ['2-2', '0-4'] });
+  assert.equal(h.payload().entry_type, 'power-spot');
+  assert.deepEqual(h.payload().applicable_sites, ['2-2', '0-4']);
+  assert.deepEqual(saved.applicableSites, ['2-2', '0-4']);
+  assert.equal(saved.entryType, 'power-spot');
+  assert.deepEqual(Array.from((await h.store.loadCachedStrategies())[0].applicableSites), ['2-2', '0-4']);
+});
+
+test('existing strategies do not require the Power Spot column before migration', async () => {
+  const h = harness();
+  await h.store.saveStrategy(record);
+  assert.equal('applicable_sites' in h.payload(), false);
+});

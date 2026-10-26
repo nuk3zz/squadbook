@@ -2,6 +2,8 @@
 
 Scope: Squadbook only. Windows checkout `C:\Projects\squadbook`. This is the canonical resume point; older stage plans and dated learnings are historical context. Read `../RESTORE.md` for fresh Windows/Linux/macOS setup and backup boundaries.
 
+Local feature follow-up, 26 October 2026: defense-only Power Spots precede Strategies, with multiple titled photo groups per site and multi-site applicability. See `power-spots.md`. Shared migration `supabase/migrations/20261026_power_spots.sql` was applied and verified against the existing production project on 26 October; frontend release to the existing GitHub Pages URL is authorized and prepared. Adapter URL is now v5 and shell cache v6. Earlier pending migrations remain pending.
+
 Documentation follow-up, 18 October 2026: root README now includes a four-step mobile GIF and mobile/desktop screenshots in `docs/media/`. Captures use synthetic records in an ignored, isolated local copy; no production app data/source or shared backend changed. Refresh instructions and capture helpers are documented in `docs/media/README.md`. The pending backend migration and cloud-data backup below remain pending.
 
 ## Source and hosting

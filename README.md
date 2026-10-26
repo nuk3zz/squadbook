@@ -35,6 +35,7 @@ Choose a map, narrow down the Bomb site, and open a visual plan. Operator roles,
 - Lightweight player profiles with no email or verification code
 - Unlimited labeled screenshot-and-note references with gallery filters, file upload, or clipboard paste
 - Standalone bomb-site setups for cams, drone spots, gadget placements, angles, and tricks—kept separate from full strategies
+- Defense-only Power Spots grouped by title, with multiple photos and applicability to one or several bomb sites
 - Creator and latest-editor profile attribution with compact avatars
 - Four-digit profile recovery across browsers and devices
 - Optional Supabase sharing, private media storage, and realtime refresh
