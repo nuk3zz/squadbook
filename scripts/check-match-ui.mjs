@@ -369,3 +369,9 @@ assert.equal(element('#add-setup').disabled,false);
 api.openStrategyEditor(null,'setup');
 assert.equal(element('#strategy-dialog').open,true,'Defense retains setup editing');
 console.log('Passed: Attack section order is Strategies then Flank Watch; Site setups are defense-only and existing records are preserved.');
+
+reseed([{ ...record('echo-defense','basement',0,'defense','setup'),setupType:'Drone Placement', references:[{id:'echo-photo',label:'Drone Placement',image:'synthetic-echo',note:'Cross angle'}] }]);
+assert.deepEqual(ids('#setup-list'),['echo-defense'],'Defense displays a drone setup');
+api.openStrategyEditor(api.records()[0]);
+assert.equal(element('#setup-type').value,'Drone Placement','Editing a defense Echo setup preserves its drone classification');
+console.log('Passed: defense drone setups remain visible and retain their setup type on edit.');

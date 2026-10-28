@@ -1,4 +1,4 @@
-const CACHE_NAME = "squadbook-shell-v7";
+const CACHE_NAME = "squadbook-shell-v8";
 const APP_SHELL = [
   "./",
   "./index.html",
