@@ -125,3 +125,21 @@ test('existing strategies do not require the Power Spot column before migration'
   await h.store.saveStrategy(record);
   assert.equal('applicable_sites' in h.payload(), false);
 });
+
+test('operator alternative slots survive shared save and cache without changing legacy singletons', async () => {
+  const h = harness();
+  const saved = await h.store.saveStrategy({ ...record, operators: ['thermite|ace', 'nomad'] });
+  assert.deepEqual(h.payload().operators, ['thermite|ace', 'nomad']);
+  assert.deepEqual(saved.operators, ['thermite|ace', 'nomad']);
+  assert.deepEqual(Array.from((await h.store.loadCachedStrategies())[0].operators), ['thermite|ace', 'nomad']);
+});
+
+test('Flank Watch preserves attack category, applicable sites and lineup alternatives', async () => {
+  const h = harness();
+  const saved = await h.store.saveStrategy({ ...record, entryType: 'flank-watch', applicableSites: ['2-2', '0-4'], operators: ['nomad|gridlock'] });
+  assert.equal(h.payload().entry_type, 'flank-watch');
+  assert.deepEqual(h.payload().applicable_sites, ['2-2', '0-4']);
+  assert.equal(saved.entryType, 'flank-watch');
+  assert.deepEqual(saved.operators, ['nomad|gridlock']);
+  assert.deepEqual(Array.from((await h.store.loadCachedStrategies())[0].applicableSites), ['2-2', '0-4']);
+});

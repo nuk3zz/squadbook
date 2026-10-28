@@ -98,7 +98,7 @@ const context = vm.createContext({
   Date,
 });
 vm.runInContext(`${source}\nglobalThis.harness = {
-  populateMaps, renderStrategies, openStrategyEditor, openStrategy,
+  populateMaps, selectMap, renderStrategies, openStrategyEditor, openStrategy, operatorGroups,
   seed(next) { maps = next.maps; sitesByMap = next.sites; strategies = normalizeStrategies(next.records); playerProfile = {id:'tester',name:'Tester'}; store = next.store; browseFloor = 'all'; browseSite = 'all'; },
   records() { return strategies; },
   references(next) { pendingReferences = next; },
@@ -109,7 +109,7 @@ const sites = { club: [{ id: 'basement', label: 'B Church / Arsenal', floor: 0 }
 const record = (id, site, floor, side = 'attack', entryType = 'strategy', map = 'club') => ({ id, title: id, site, floor, side, entryType, map, author: 'Tester', authorId: 'tester', operators: [], steps: [], references: [] });
 const saves = [];
 const store = { mode: 'local', async saveStrategy(value) { saves.push(value); return value; } };
-const reseed = records => { api.seed({ maps, sites, records, store }); api.populateMaps(); api.renderStrategies(); };
+const reseed = records => { api.seed({ maps, sites, records, store }); api.populateMaps(); api.selectMap("club"); api.renderStrategies(); };
 const ids = selector => element(selector).querySelectorAll('[data-id]').map(node => node.dataset.id);
 const clickChip = async (container, key, value) => {
   const chip = element(container).children.find(node => node.dataset[key] === value);
@@ -125,14 +125,15 @@ reseed([
   record('other-map', 'bank-site', 0, 'attack', 'strategy', 'bank'),
 ]);
 assert.deepEqual(ids('#strategy-list'), ['attack-low', 'attack-high'], 'Initially show every selected-side strategy across sites');
-assert.deepEqual(ids('#setup-list'), ['attack-setup'], 'Initially show selected-side setups');
+assert.deepEqual(ids('#setup-list'), [], 'Legacy attack setups are hidden without deleting their records');
+assert.equal(element('#setups-section').hidden, true);
 await element('#side-switch').dispatch('click', sideButtons[1]);
 assert.deepEqual(ids('#strategy-list'), ['defense-low'], 'Defense toggle isolates defense');
 assert.deepEqual(ids('#setup-list'), [], 'Defense excludes attack setups');
 await element('#side-switch').dispatch('click', sideButtons[0]);
 await clickChip('#floor-chips', 'floor', '2');
 assert.deepEqual(ids('#strategy-list'), ['attack-high'], 'Floor filter limits strategies');
-assert.deepEqual(ids('#setup-list'), ['attack-setup'], 'Floor filter limits setups');
+assert.deepEqual(ids('#setup-list'), [], 'Attack never displays site setups');
 await clickChip('#floor-chips', 'floor', 'all');
 await clickChip('#site-chips', 'site', 'basement');
 assert.deepEqual(ids('#strategy-list'), ['attack-low'], 'Site filter limits strategies');
@@ -265,3 +266,106 @@ assert.ok(!element('#reference-media').innerHTML.includes('synthetic-garage'), '
 api.openStrategyEditor(api.records()[0]);
 assert.equal((element('#reference-editor-list').innerHTML.match(/class="reference-editor"/g) || []).length, 3, 'Editor restores every photo for this title');
 console.log('Passed: multiple titled Power Spots per site, multi-photo title groups, gallery separation, and editing multiple photos.');
+
+// Startup defaults to Bank, with a safe fallback when Bank is unavailable.
+api.populateMaps();
+assert.equal(element('#map').value, 'bank');
+api.seed({ maps: [maps[0]], sites, records: [], store });
+api.populateMaps();
+assert.equal(element('#map').value, 'club');
+reseed([]);
+await element('#side-switch').dispatch('click', sideButtons[0]);
+api.openStrategyEditor();
+const chooseOperator = async slug => {
+  const button = element('#operator-picker').children.find(node => node.dataset.operator === slug);
+  assert.ok(button, `Available operator ${slug}`);
+  await element('#operator-picker').dispatch('click', button);
+};
+const chooseAlternative = async index => {
+  const button = element('#operator-lineup-editor').children.find(node => node.dataset.addAlternative === String(index));
+  assert.ok(button);
+  await element('#operator-lineup-editor').dispatch('click', button);
+};
+await chooseOperator('thermite');
+await chooseAlternative(0);
+await chooseOperator('ace');
+await chooseOperator('nomad');
+element('#strategy-title').value = 'Alternative attack';
+await element('#strategy-form').dispatch('submit');
+assert.deepEqual(Array.from(saves.at(-1).operators), ['thermite|ace', 'nomad'], 'Alternatives save as one lineup slot, singletons remain unchanged');
+api.openStrategy(saves.at(-1));
+assert.ok(element('#operators').innerHTML.includes('Thermite or Ace'));
+assert.ok(!element('#operators').innerHTML.includes('thermite|ace.svg'), 'Groups never become invalid asset names');
+api.openStrategyEditor(saves.at(-1));
+assert.ok(element('#operator-lineup-editor').innerHTML.includes('Remove Ace'), 'Edit restores alternatives');
+const removeThermite = element('#operator-lineup-editor').children.find(node => node.dataset.removeOperator === 'thermite');
+await element('#operator-lineup-editor').dispatch('click', removeThermite);
+await element('#strategy-form').dispatch('submit');
+assert.deepEqual(Array.from(saves.at(-1).operators), ['ace', 'nomad'], 'Removing primary retains its alternative as a singleton');
+await element('#side-switch').dispatch('click', sideButtons[1]);
+api.openStrategyEditor(null, 'power-spot');
+assert.equal(element('#operator-section').hidden, false, 'Power Spots expose lineups');
+await chooseOperator('bandit');
+await chooseAlternative(0);
+await chooseOperator('kaid');
+element('#strategy-title').value = 'Alternative defense hold';
+await element('#strategy-form').dispatch('submit');
+assert.deepEqual(Array.from(saves.at(-1).operators), ['bandit|kaid']);
+api.openStrategy(saves.at(-1));
+assert.equal(element('#operator-panel').hidden, false, 'Power Spot detail shows its lineup');
+assert.ok(element('#operators').innerHTML.includes('Bandit or Kaid'));
+assert.ok(element('#power-spot-list').innerHTML.includes('Bandit or Kaid'), 'Power Spot card shows alternatives');
+assert.deepEqual(Array.from(api.operatorGroups(['thermite|ace','thermite','nomad','bandit','invalid'], 'attack'), group => Array.from(group)), [['thermite','ace'],['nomad']], 'Side validation and deduplication keep groups valid');
+api.openStrategyEditor(null, 'setup');
+assert.equal(element('#operator-section').hidden, true, 'Site setup behavior is unchanged');
+console.log('Passed: Bank startup/fallback, attack/defense alternative slots, Power Spot lineup edit/save/display, removal, legacy singletons, and side validation.');
+
+await element('#side-switch').dispatch('click', sideButtons[0]);
+reseed([{ ...record('Lobby drone watch', 'basement', 0, 'attack', 'flank-watch'), applicableSites:['basement','upstairs'], operators:['nomad|gridlock'] }, record('wrong-side-watch', 'basement', 0, 'defense', 'flank-watch')]);
+assert.equal(element('#flank-watch-section').hidden, false);
+assert.deepEqual(ids('#flank-watch-list'), ['Lobby drone watch']);
+assert.deepEqual(ids('#setup-list'), []);
+assert.deepEqual(ids('#strategy-list'), []);
+await clickChip('#floor-chips','floor','2');
+assert.deepEqual(ids('#flank-watch-list'), ['Lobby drone watch']);
+await element('#side-switch').dispatch('click', sideButtons[1]);
+assert.equal(element('#flank-watch-section').hidden, true);
+assert.deepEqual(ids('#flank-watch-list'), [], 'Malformed defense flank watch is excluded');
+element('#strategy-dialog').close();
+api.openStrategyEditor(null,'flank-watch');
+assert.equal(element('#strategy-dialog').open,false, 'Defense cannot add a flank watch');
+await element('#side-switch').dispatch('click', sideButtons[0]);
+api.openStrategyEditor(null,'flank-watch');
+assert.equal(element('#strategy-form-title').textContent,'Add Flank Watch');
+assert.equal(element('#operator-section').hidden,false);
+element('#strategy-title').value='Nomad flank coverage';
+await chooseOperator('nomad');
+await chooseAlternative(0);
+await chooseOperator('gridlock');
+api.references([{id:'flank-photo',image:'synthetic-drone',label:'Other',note:'Watch lobby stairs'}]);
+await element('#strategy-form').dispatch('submit');
+assert.equal(saves.at(-1).entryType,'flank-watch');
+assert.equal(saves.at(-1).side,'attack');
+assert.equal(saves.at(-1).references[0].label,'Flank Watch');
+assert.deepEqual(Array.from(saves.at(-1).operators),['nomad|gridlock']);
+api.openStrategy(saves.at(-1));
+assert.ok(element('#detail-path').textContent.includes('Flank Watch'));
+assert.equal(element('#operator-panel').hidden,false);
+assert.ok(element('#operators').innerHTML.includes('Nomad or Gridlock'));
+assert.ok(!element('#operators').innerHTML.includes('class="operator-or"'), 'Display bundles overlap icons instead of inserting a small or');
+console.log('Passed: attack-only Flank Watch category, secondary-floor filtering, editor/save/photos, operator alternatives, and bundle markup.');
+
+assert.ok(html.indexOf('aria-labelledby="result-title"') < html.indexOf('id="flank-watch-section"'), 'Strategies precedes Flank Watch');
+await element('#side-switch').dispatch('click', sideButtons[0]);
+assert.equal(element('#setups-section').hidden,true);
+assert.equal(element('#add-setup').disabled,true);
+element('#strategy-dialog').close();
+api.openStrategyEditor(null,'setup');
+assert.equal(element('#strategy-dialog').open,false,'Attack cannot open the setup editor');
+assert.ok(api.records().some(item => item.entryType === 'flank-watch'), 'Category visibility does not remove records');
+await element('#side-switch').dispatch('click', sideButtons[1]);
+assert.equal(element('#setups-section').hidden,false);
+assert.equal(element('#add-setup').disabled,false);
+api.openStrategyEditor(null,'setup');
+assert.equal(element('#strategy-dialog').open,true,'Defense retains setup editing');
+console.log('Passed: Attack section order is Strategies then Flank Watch; Site setups are defense-only and existing records are preserved.');

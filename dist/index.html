@@ -695,7 +695,17 @@
       object-fit: contain;
     }
 
-    .operator-slot img + img { margin-left: -18px; border: 2px solid var(--panel-2); }
+    .operator-slot { flex-wrap: wrap; gap: 0; max-width: 100%; }
+    .operator-slot img + img { margin-left: -10px; }
+    .operator-or { color: var(--muted); font-size: .8rem; padding-inline: 2px; }
+    .operator-lineup-editor { display: grid; gap: 8px; margin-top: 12px; }
+    .operator-lineup-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px; background: var(--panel-2); border-radius: 10px; }
+    .operator-lineup-row.active { outline: 1px solid var(--accent); }
+    .operator-member { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 4px 8px; background: var(--panel); border: 1px solid #303742; border-radius: 8px; color: var(--text); cursor: pointer; font: inherit; font-size: .85rem; }
+    .operator-member img { width: 30px; height: 30px; object-fit: contain; }
+    .operator-picker-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; color: var(--muted); font-size: .85rem; }
+    .mini-operator-group { display: inline-flex; max-width: 100%; align-items: center; gap: 0; padding: 3px; background: var(--panel-2); border-radius: 5px; }
+    .mini-operator-group img + img { margin-left: -5px; }
 
     .steps {
       display: grid;
@@ -865,7 +875,7 @@
     .setup .match-kind { color: #7de3b0; }
     .match-title { font-size: .88rem; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .match-card .tile-location { font-size: .65rem; line-height: 1.25; }
-    .match-card .mini-operators { margin: 1px 0 0; gap: 3px; flex-wrap: wrap; }
+    .match-card .mini-operators { margin: 1px 0 0; gap: 10px; flex-wrap: wrap; }
     .match-card .mini-operators img { width: 22px; height: 22px; border-radius: 0; }
     .match-credit { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: .6rem; margin-top: auto; padding-top: 2px; overflow: hidden; }
     .match-credit .author-avatar { width: 15px; height: 15px; font-size: .4rem; flex-shrink: 0; }
@@ -952,7 +962,7 @@
       </div>
 
       <section class="round-controls" aria-label="Choose the round">
-        <div class="round-toolbar"><h1 id="selected-map-name">Club House</h1><button class="blueprint-link" id="home-blueprint-link" type="button">Blueprint ↗</button></div>
+        <div class="round-toolbar"><h1 id="selected-map-name">Bank</h1><button class="blueprint-link" id="home-blueprint-link" type="button">Blueprint ↗</button></div>
         <div class="control-line">
           <div class="side-switch" id="side-switch" aria-label="Side"><button type="button" data-side="attack" aria-pressed="true">Attack</button><button type="button" data-side="defense" aria-pressed="false">Defense</button></div>
           <div class="floor-chips" id="floor-chips" aria-label="Filter floor"></div>
@@ -988,7 +998,14 @@
         </div>
         <div id="strategy-list" class="strategy-grid"></div>
       </section>
-      <section class="entry-section" aria-labelledby="setups-title">
+      <section class="entry-section" id="flank-watch-section" aria-labelledby="flank-watch-title" hidden>
+        <div class="section-head">
+          <h2 id="flank-watch-title">Flank Watch</h2>
+          <div class="section-actions"><span id="flank-watch-count">0</span><button class="primary-button" id="add-flank-watch" type="button">+ Flank Watch</button></div>
+        </div>
+        <div id="flank-watch-list" class="setup-grid"></div>
+      </section>
+      <section class="entry-section" id="setups-section" aria-labelledby="setups-title" hidden>
         <div class="section-head">
           <h2 id="setups-title">Site setups</h2>
           <div class="section-actions"><span id="setup-count">0</span><button class="primary-button setup-add" id="add-setup" type="button">+ Setup</button></div>
@@ -1096,6 +1113,8 @@
 
       <details class="editor-section" id="operator-section">
         <summary class="editor-label">Operators · optional · include backups for bans</summary>
+        <div id="operator-lineup-editor" class="operator-lineup-editor"></div>
+        <div class="operator-picker-head"><span id="operator-picker-label">Choose operators</span><button class="secondary-button" id="operator-alternative-done" type="button" hidden>Done</button></div>
         <div class="operator-picker" id="operator-picker"></div>
         <div class="operator-count" id="operator-count">0 selected</div>
       </details>
@@ -1124,7 +1143,7 @@
   </dialog>
 
   <script src="assets/vendor/supabase-2.117.1.min.js"></script>
-  <script src="assets/shared-store.js?v=5"></script>
+  <script src="assets/shared-store.js?v=6"></script>
   <script>
     let maps = [];
     let blueprintRequest = 0;
@@ -1150,9 +1169,14 @@
       "gym-bedroom": "2-1",
       "cctv-cash": "2-2"
     };
+    const siteReferenceTypes = {
+      "power-spot": { label: "Power Spot", side: "defense" },
+      "flank-watch": { label: "Flank Watch", side: "attack" }
+    };
     let strategies = [];
     let activeStrategy = null;
-    let selectedOperators = [];
+    let selectedOperatorGroups = [];
+    let alternativeGroupIndex = -1;
     let pendingReferences = [];
     let availableProfiles = [];
     let selectedProfileId = "";
@@ -1448,15 +1472,44 @@
       renderReferenceEditors();
     }
 
+    // Each text-array entry is a lineup slot; pipes separate alternatives in that slot.
+    // Existing single-slug entries keep their original meaning and storage shape.
+    function operatorGroups(values, side) {
+      const allowed = operatorIdsBySide[side] || [];
+      const used = new Set();
+      return (Array.isArray(values) ? values : []).map(value => String(value).split("|").filter(slug => {
+        if (!allowed.includes(slug) || used.has(slug)) return false;
+        used.add(slug);
+        return true;
+      })).filter(group => group.length);
+    }
+
+    function operatorGroupMarkup(group, compact = false) {
+      const label = group.map(operatorName).join(" or ");
+      return `<span class="${compact ? "mini-operator-group" : "operator-slot"}" role="group" aria-label="${label}" title="${label}">${group.map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}</span>`;
+    }
+
     function renderOperatorPicker() {
-      const operatorIds = operatorIdsBySide[sideSelect.value] || [];
-      selectedOperators = selectedOperators.filter(slug => operatorIds.includes(slug));
+      const side = strategies.find(item => item.id === strategyId.value)?.side || sideSelect.value;
+      const operatorIds = operatorIdsBySide[side] || [];
+      selectedOperatorGroups = operatorGroups(selectedOperatorGroups.map(group => group.join("|")), side);
+      if (!selectedOperatorGroups[alternativeGroupIndex]) alternativeGroupIndex = -1;
+      const selected = selectedOperatorGroups.flat();
+      const active = selectedOperatorGroups[alternativeGroupIndex];
+      document.querySelector("#operator-lineup-editor").innerHTML = selectedOperatorGroups.map((group, index) => `
+        <div class="operator-lineup-row ${index === alternativeGroupIndex ? "active" : ""}">
+          ${group.map(slug => `<button class="operator-member" type="button" data-remove-operator="${slug}" aria-label="Remove ${operatorName(slug)}"><img src="assets/operators/${slug}.svg" alt="">${operatorName(slug)} <span aria-hidden="true">×</span></button>`).join('<span class="operator-or">or</span>')}
+          <button class="secondary-button" type="button" data-add-alternative="${index}" aria-pressed="${index === alternativeGroupIndex}">+ Alternative</button>
+        </div>
+      `).join("");
+      document.querySelector("#operator-picker-label").textContent = active ? `Choose alternative for ${active.map(operatorName).join(" or ")}` : "Choose operators";
+      document.querySelector("#operator-alternative-done").hidden = !active;
       operatorPicker.innerHTML = operatorIds.map(slug => `
-        <button class="operator-choice ${selectedOperators.includes(slug) ? "selected" : ""}" type="button" data-operator="${slug}" title="${operatorName(slug)}" aria-label="${operatorName(slug)}" aria-pressed="${selectedOperators.includes(slug)}">
+        <button class="operator-choice ${selected.includes(slug) ? "selected" : ""}" type="button" data-operator="${slug}" title="${operatorName(slug)}" aria-label="${operatorName(slug)}" aria-pressed="${selected.includes(slug)}" ${active && selected.includes(slug) ? "disabled" : ""}>
           <img src="assets/operators/${slug}.svg" alt="">
         </button>
       `).join("");
-      document.querySelector("#operator-count").textContent = `${selectedOperators.length} selected`;
+      document.querySelector("#operator-count").textContent = `${selectedOperatorGroups.length} lineup slot${selectedOperatorGroups.length === 1 ? "" : "s"}`;
     }
 
     function setSyncStatus(mode, label, title) {
@@ -1469,7 +1522,7 @@
     function normalizeStrategies(records) {
       return records.map(strategy => ({
         ...strategy,
-        entryType: ["setup", "power-spot"].includes(strategy.entryType) ? strategy.entryType : "strategy",
+        entryType: ["setup", ...Object.keys(siteReferenceTypes)].includes(strategy.entryType) ? strategy.entryType : "strategy",
         applicableSites: [...new Set((Array.isArray(strategy.applicableSites) && strategy.applicableSites.length ? strategy.applicableSites : [strategy.site]).map(id => strategy.map === "club" ? (legacyClubSiteIds[id] || id) : id))],
         setupType: strategy.setupType || "",
         operators: Array.isArray(strategy.operators) ? strategy.operators : [],
@@ -1505,40 +1558,43 @@
       const map = currentMap();
       if (!map || siteSelect.disabled) return;
       editingEntryType = item?.entryType || requestedType;
-      if (!["strategy", "setup", "power-spot"].includes(editingEntryType)) editingEntryType = "strategy";
-      const isPowerSpot = editingEntryType === "power-spot";
-      if (isPowerSpot && (item?.side || sideSelect.value) !== "defense") return;
+      if (!["strategy", "setup", ...Object.keys(siteReferenceTypes)].includes(editingEntryType)) editingEntryType = "strategy";
+      const referenceType = siteReferenceTypes[editingEntryType];
+      const isSiteReference = Boolean(referenceType);
+      if (editingEntryType === "setup" && (item?.side || sideSelect.value) !== "defense") return;
+      if (isSiteReference && (item?.side || sideSelect.value) !== referenceType.side) return;
       const isSetup = editingEntryType !== "strategy";
-      const entryLabel = isPowerSpot ? "Power Spot" : isSetup ? "setup" : "strategy";
-      document.querySelector("#power-spot-sites-section").hidden = !isPowerSpot;
+      const entryLabel = referenceType?.label || (isSetup ? "setup" : "strategy");
+      document.querySelector("#power-spot-sites-section").hidden = !isSiteReference;
       selectedPowerSpotSites = [...(item?.applicableSites || [item?.site || siteSelect.value])];
       document.querySelector("#power-spot-sites").innerHTML = (sitesByMap[item?.map || map.id] || []).map(site => `
         <label class="power-spot-site"><input type="checkbox" data-power-spot-site="${escapeHtml(site.id)}" ${selectedPowerSpotSites.includes(site.id) ? "checked" : ""}>${escapeHtml(site.label)}</label>
       `).join("");
       strategyId.value = item?.id || "";
       strategyTitle.value = item?.title || "";
-      strategyTitle.previousElementSibling.textContent = isPowerSpot ? "Power Spot title" : isSetup ? "Setup name" : "Strategy name";
-      strategyTitle.placeholder = isPowerSpot ? "Example: Blue stairs hold" : isSetup ? "Example: Valk cam on square" : "Example: Garage take";
-      setupTypeSection.hidden = !isSetup || isPowerSpot;
+      strategyTitle.previousElementSibling.textContent = isSiteReference ? `${entryLabel} title` : isSetup ? "Setup name" : "Strategy name";
+      strategyTitle.placeholder = isSiteReference ? (editingEntryType === "flank-watch" ? "Example: Lobby flank drone" : "Example: Blue stairs hold") : isSetup ? "Example: Valk cam on square" : "Example: Garage take";
+      setupTypeSection.hidden = !isSetup || isSiteReference;
       const setupTypes = setupTypesBySide[item?.side || sideSelect.value] || setupTypesBySide.attack;
       setupTypeSelect.innerHTML = setupTypes.map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join("");
       setupTypeSelect.value = setupTypes.includes(item?.setupType) ? item.setupType : setupTypes[0];
-      operatorSection.hidden = isSetup;
+      operatorSection.hidden = editingEntryType === "setup";
       checkpointSection.hidden = isSetup;
-      document.querySelector("#visual-reference-label").textContent = isPowerSpot ? "Power Spot photos · optional" : isSetup ? "Setup photos · add at least one" : "Photos · optional · first photo is thumbnail";
-      strategyLocationSection.hidden = isPowerSpot;
+      document.querySelector("#visual-reference-label").textContent = isSiteReference ? `${entryLabel} photos · optional` : isSetup ? "Setup photos · add at least one" : "Photos · optional · first photo is thumbnail";
+      strategyLocationSection.hidden = isSiteReference;
       strategyLocationSection.open = !item;
       document.querySelector("#strategy-location-summary").textContent = item ? `Wrong bomb site? Move ${entryLabel}` : "Bomb site";
       strategyLocation.innerHTML = (sitesByMap[item?.map || map.id] || []).map(site => `<option value="${site.id}" ${site.id === (item?.site || siteSelect.value) ? "selected" : ""}>${escapeHtml(site.label)}</option>`).join("");
-      selectedOperators = isSetup ? [] : [...(item?.operators || [])];
+      selectedOperatorGroups = editingEntryType === "setup" ? [] : operatorGroups(item?.operators, item?.side || sideSelect.value);
+      alternativeGroupIndex = -1;
       pendingReferences = strategyReferences(item).map(reference => ({ ...reference }));
       checkpointInputs.forEach((input, index) => input.value = isSetup ? "" : (item?.steps?.[index] || ""));
       document.querySelector("#strategy-form-title").textContent = `${item ? "Edit" : "Add"} ${entryLabel}`;
-      document.querySelector("#strategy-context").textContent = isPowerSpot ? `${map.name} · Defense` : `${map.name} · ${siteLabel()} · ${sideSelect.value === "attack" ? "Attack" : "Defense"}`;
+      document.querySelector("#strategy-context").textContent = isSiteReference ? `${map.name} · ${referenceType.side === "attack" ? "Attack" : "Defense"}` : `${map.name} · ${siteLabel()} · ${sideSelect.value === "attack" ? "Attack" : "Defense"}`;
       document.querySelector("#delete-strategy").hidden = !item;
       document.querySelector("#delete-strategy").textContent = `Delete ${entryLabel}`;
       document.querySelector("#strategy-save").textContent = `Save ${entryLabel}`;
-      operatorSection.open = selectedOperators.length > 0;
+      operatorSection.open = selectedOperatorGroups.length > 0;
       renderOperatorPicker();
       renderReferenceEditors();
       strategyDialog.showModal();
@@ -1773,6 +1829,7 @@
     });
 
     addStrategyButton.addEventListener("click", () => openStrategyEditor());
+    document.querySelector("#add-flank-watch").addEventListener("click", () => openStrategyEditor(null, "flank-watch"));
     document.querySelector("#add-power-spot").addEventListener("click", () => openStrategyEditor(null, "power-spot"));
     document.querySelector("#power-spot-sites").addEventListener("change", event => {
       const id = event.target.dataset.powerSpotSite;
@@ -1783,14 +1840,37 @@
     editStrategyButton.addEventListener("click", () => activeStrategy && openStrategyEditor(activeStrategy));
     document.querySelector("#strategy-close").addEventListener("click", () => strategyDialog.close());
     document.querySelector("#strategy-cancel").addEventListener("click", () => strategyDialog.close());
+    function removeLineupOperator(slug) {
+      const activeGroup = selectedOperatorGroups[alternativeGroupIndex];
+      selectedOperatorGroups = selectedOperatorGroups.map(group => group.filter(item => item !== slug)).filter(group => group.length);
+      alternativeGroupIndex = activeGroup ? selectedOperatorGroups.findIndex(group => group.some(item => activeGroup.includes(item))) : -1;
+      renderOperatorPicker();
+    }
+    document.querySelector("#operator-lineup-editor").addEventListener("click", event => {
+      const remove = event.target.closest("[data-remove-operator]");
+      if (remove) { removeLineupOperator(remove.dataset.removeOperator); return; }
+      const add = event.target.closest("[data-add-alternative]");
+      if (!add) return;
+      alternativeGroupIndex = Number(add.dataset.addAlternative);
+      renderOperatorPicker();
+    });
+    document.querySelector("#operator-alternative-done").addEventListener("click", () => {
+      alternativeGroupIndex = -1;
+      renderOperatorPicker();
+    });
     operatorPicker.addEventListener("click", event => {
       const button = event.target.closest("[data-operator]");
-      if (!button) return;
+      if (!button || button.disabled) return;
       const slug = button.dataset.operator;
-      if (selectedOperators.includes(slug)) {
-        selectedOperators = selectedOperators.filter(item => item !== slug);
+      if (selectedOperatorGroups.flat().includes(slug)) {
+        if (alternativeGroupIndex < 0) removeLineupOperator(slug);
+        return;
+      }
+      if (alternativeGroupIndex >= 0) {
+        selectedOperatorGroups[alternativeGroupIndex].push(slug);
+        alternativeGroupIndex = -1;
       } else {
-        selectedOperators.push(slug);
+        selectedOperatorGroups.push([slug]);
       }
       renderOperatorPicker();
     });
@@ -1847,13 +1927,14 @@
     strategyForm.addEventListener("submit", async event => {
       event.preventDefault();
       const existing = strategies.find(item => item.id === strategyId.value);
-      const isPowerSpot = editingEntryType === "power-spot";
+      const referenceType = siteReferenceTypes[editingEntryType];
+      const isSiteReference = Boolean(referenceType);
       const applicableSites = (sitesByMap[existing?.map || mapSelect.value] || []).filter(site => selectedPowerSpotSites.includes(site.id));
-      if (isPowerSpot && ((existing?.side || sideSelect.value) !== "defense" || !applicableSites.length)) {
-        alert("Select at least one defense bomb site for this Power Spot.");
+      if (isSiteReference && ((existing?.side || sideSelect.value) !== referenceType.side || !applicableSites.length)) {
+        alert(`Select at least one ${referenceType.side} bomb site for this ${referenceType.label}.`);
         return;
       }
-      const movedSite = isPowerSpot ? applicableSites[0] : (sitesByMap[existing?.map || mapSelect.value] || []).find(site => site.id === strategyLocation.value);
+      const movedSite = isSiteReference ? applicableSites[0] : (sitesByMap[existing?.map || mapSelect.value] || []).find(site => site.id === strategyLocation.value);
       const record = {
         ...existing,
         id: existing?.id || (crypto.randomUUID?.() || String(Date.now())),
@@ -1867,13 +1948,13 @@
         editor: existing ? playerProfile.name : "",
         editorId: existing ? playerProfile.id : "",
         entryType: editingEntryType,
-        applicableSites: isPowerSpot ? applicableSites.map(site => site.id) : [],
+        applicableSites: isSiteReference ? applicableSites.map(site => site.id) : [],
         setupType: editingEntryType === "setup" ? setupTypeSelect.value : "",
-        operators: editingEntryType !== "strategy" ? [] : [...selectedOperators],
+        operators: editingEntryType === "setup" ? [] : selectedOperatorGroups.map(group => group.join("|")),
         steps: editingEntryType !== "strategy" ? [] : checkpointInputs.map(input => input.value.trim()).filter(Boolean),
         references: pendingReferences.filter(reference => reference.image).map(reference => ({
           ...reference,
-          label: isPowerSpot ? "Power Spot" : editingEntryType === "setup" ? setupTypeSelect.value : (reference.label || "Other"),
+          label: isSiteReference ? referenceType.label : editingEntryType === "setup" ? setupTypeSelect.value : (reference.label || "Other"),
           note: reference.note.trim()
         })),
         previousReferences: strategyReferences(existing),
@@ -1992,7 +2073,7 @@
 
     function populateMaps() {
       mapSelect.innerHTML = maps.map(map => `<option value="${map.id}">${map.name}</option>`).join("");
-      mapSelect.value = maps.some(map => map.id === "club") ? "club" : maps[0]?.id;
+      mapSelect.value = maps.some(map => map.id === "bank") ? "bank" : maps[0]?.id;
       renderMapPicker();
       populateFloors();
       populateSites();
@@ -2058,21 +2139,27 @@
       if (!map) return;
       const sideItems = strategies.filter(item => item.map === map.id && item.side === sideSelect.value);
       const siteItems = sideItems.filter(item => {
-        if (item.entryType !== "power-spot") return (browseFloor === "all" || String(item.floor) === browseFloor) && (browseSite === "all" || item.site === browseSite);
-        return item.side === "defense" && (sitesByMap[item.map] || []).some(site => item.applicableSites.includes(site.id) && (browseFloor === "all" || String(site.floor) === browseFloor) && (browseSite === "all" || site.id === browseSite));
+        if (!siteReferenceTypes[item.entryType]) return (browseFloor === "all" || String(item.floor) === browseFloor) && (browseSite === "all" || item.site === browseSite);
+        return item.side === siteReferenceTypes[item.entryType].side && (sitesByMap[item.map] || []).some(site => item.applicableSites.includes(site.id) && (browseFloor === "all" || String(site.floor) === browseFloor) && (browseSite === "all" || site.id === browseSite));
       });
       document.querySelector("#power-spots-section").hidden = sideSelect.value !== "defense";
       document.querySelector("#add-power-spot").disabled = siteSelect.disabled;
+      document.querySelector("#flank-watch-section").hidden = sideSelect.value !== "attack";
+      document.querySelector("#add-flank-watch").disabled = siteSelect.disabled;
+      const flankWatches = siteItems.filter(item => item.entryType === "flank-watch");
+      document.querySelector("#flank-watch-count").textContent = String(flankWatches.length);
       const powerSpots = siteItems.filter(item => item.entryType === "power-spot");
       document.querySelector("#power-spot-count").textContent = String(powerSpots.length);
       const items = siteItems.filter(item => item.entryType === "strategy");
-      const setups = siteItems.filter(item => item.entryType === "setup");
+      document.querySelector("#setups-section").hidden = sideSelect.value !== "defense";
+      addSetupButton.disabled = siteSelect.disabled || sideSelect.value !== "defense";
+      const setups = siteItems.filter(item => item.entryType === "setup" && item.side === "defense");
       document.querySelector("#result-title").textContent = "Strategies";
       document.querySelector("#result-count").textContent = String(items.length);
       document.querySelector("#setup-count").textContent = String(setups.length);
 
       const locationLabel = item => {
-        if (item.entryType === "power-spot") return powerSpotLocation(item);
+        if (siteReferenceTypes[item.entryType]) return applicableSiteLabel(item);
         const site = (sitesByMap[item.map] || []).find(site => site.id === item.site);
         return site?.label || `${floorLabel(currentMap(), item.floor)} · Bomb site`;
       };
@@ -2085,10 +2172,10 @@
             ${references.length > 1 ? `<span class="setup-photo-count">${references.length} photos</span>` : ""}
           </span>
           <span class="match-body">
-            <span class="match-kind">${item.entryType === "power-spot" ? "Power Spot" : isSetup ? `Setup · ${escapeHtml(item.setupType || "Other")}` : "Strategy"}</span>
+            <span class="match-kind">${siteReferenceTypes[item.entryType] ? siteReferenceTypes[item.entryType].label : isSetup ? `Setup · ${escapeHtml(item.setupType || "Other")}` : "Strategy"}</span>
             <strong class="match-title">${escapeHtml(item.title)}</strong>
             <span class="tile-location">${escapeHtml(locationLabel(item))}</span>
-            ${!isSetup && item.operators.length ? `<span class="mini-operators">${item.operators.slice(0, 8).map(slug => `<img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}">`).join("")}${item.operators.length > 8 ? `<span>+${item.operators.length - 8}</span>` : ""}</span>` : ""}
+            ${item.entryType !== "setup" && item.operators.length ? `<span class="mini-operators">${operatorGroups(item.operators, item.side).slice(0, 8).map(group => operatorGroupMarkup(group, true)).join("")}${item.operators.length > 8 ? `<span>+${item.operators.length - 8}</span>` : ""}</span>` : ""}
             ${!isSetup ? `<span class="match-credit">${strategyCredit(item)}</span>` : ""}
           </span>
         </button>`;
@@ -2101,11 +2188,13 @@
             <span class="match-body"><span class="match-kind">Strategy · draft</span><strong class="match-title">${defaultTitle}</strong><span class="tile-location">Choose a site & add photos</span></span>
           </button>`
         : `<p class="compact-empty">No strategies here yet.</p>`);
+      const flankWatchList = document.querySelector("#flank-watch-list");
+      flankWatchList.innerHTML = flankWatches.map((item, index) => card(item, index, true)).join("") || `<p class="compact-empty">No flank watches here yet. Add a drone or player watch.</p>`;
       const powerSpotList = document.querySelector("#power-spot-list");
       powerSpotList.innerHTML = powerSpots.map((item, index) => card(item, index, true)).join("") || `<p class="compact-empty">No Power Spots here yet.</p>`;
       setupList.innerHTML = setups.map((item, index) => card(item, index, true)).join("") || `<p class="compact-empty">No setups here yet. Add a cam, angle, or trick.</p>`;
 
-      [...list.querySelectorAll("[data-id]"), ...setupList.querySelectorAll("[data-id]"), ...powerSpotList.querySelectorAll("[data-id]")].forEach(button => {
+      [...list.querySelectorAll("[data-id]"), ...setupList.querySelectorAll("[data-id]"), ...powerSpotList.querySelectorAll("[data-id]"), ...flankWatchList.querySelectorAll("[data-id]")].forEach(button => {
         button.addEventListener("click", () => openStrategy(siteItems.find(item => item.id === button.dataset.id)));
       });
       list.querySelector("[data-default-plan]")?.addEventListener("click", () => {
@@ -2114,7 +2203,7 @@
       });
     }
 
-    function powerSpotLocation(item) {
+    function applicableSiteLabel(item) {
       return (sitesByMap[item.map] || []).filter(site => (item.applicableSites || [item.site]).includes(site.id)).map(site => site.label).join(" · ");
     }
 
@@ -2168,13 +2257,12 @@
       const map = currentMap();
       const sideLabel = sideSelect.value === "attack" ? "Attack" : "Defense";
       const isSetup = item.entryType !== "strategy";
-      document.querySelector("#detail-path").textContent = `${isSetup ? `${item.entryType === "power-spot" ? "Power Spot" : item.setupType || "Site setup"} · ` : ""}${map.name} · ${item.entryType === "power-spot" ? powerSpotLocation(item) : siteLabel()} · ${sideLabel}`;
+      document.querySelector("#detail-path").textContent = `${isSetup ? `${siteReferenceTypes[item.entryType]?.label || item.setupType || "Site setup"} · ` : ""}${map.name} · ${siteReferenceTypes[item.entryType] ? applicableSiteLabel(item) : siteLabel()} · ${sideLabel}`;
       document.querySelector("#detail-title").textContent = item.title;
       document.querySelector("#detail-credit").innerHTML = strategyCredit(item);
-      document.querySelector("#operator-panel").hidden = isSetup || !item.operators.length;
-      document.querySelector("#operators").innerHTML = item.operators.map(slug => `
-        <span class="operator-slot"><img src="assets/operators/${slug}.svg" alt="${operatorName(slug)}" title="${operatorName(slug)}"></span>
-      `).join("");
+      const lineup = operatorGroups(item.operators, item.side);
+      document.querySelector("#operator-panel").hidden = item.entryType === "setup" || !lineup.length;
+      document.querySelector("#operators").innerHTML = lineup.map(group => operatorGroupMarkup(group)).join("");
       checkpointPanel.hidden = isSetup || !item.steps.length;
       document.querySelector("#steps").innerHTML = item.steps.map((step, index) => `
         <li><b>0${index + 1}</b>${escapeHtml(step)}</li>

@@ -56,11 +56,18 @@ alter table public.strategies add column if not exists applicable_sites text[] n
 
 alter table public.strategies drop constraint if exists strategies_entry_type_check;
 alter table public.strategies add constraint strategies_entry_type_check
-  check (entry_type in ('strategy', 'setup', 'power-spot'));
+  check (entry_type in ('strategy', 'setup', 'power-spot', 'flank-watch'));
 alter table public.strategies drop constraint if exists strategies_power_spot_check;
 alter table public.strategies add constraint strategies_power_spot_check
   check (entry_type <> 'power-spot' or (
     side = 'defense' and cardinality(applicable_sites) > 0
+    and site_id = any(applicable_sites)
+  ));
+
+alter table public.strategies drop constraint if exists strategies_flank_watch_check;
+alter table public.strategies add constraint strategies_flank_watch_check
+  check (entry_type <> 'flank-watch' or (
+    side = 'attack' and cardinality(applicable_sites) > 0
     and site_id = any(applicable_sites)
   ));
 

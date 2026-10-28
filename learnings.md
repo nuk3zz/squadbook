@@ -211,3 +211,13 @@
 - See `knowledge/power-spots.md` and source request `raw/2026-10-26-power-spots.md`.
 
 Deployment follow-up, 26 October 2026: user authorized publishing to the existing GitHub Pages URL. Owner-authenticated Supabase SQL editor applied the Power Spots migration; information_schema confirmed the non-null array column. No strategy/media records were changed by the migration.
+
+## 29 October 2026 — lineup alternatives, Bank startup, Flank Watch
+
+- Lineup slots store either a singleton operator ID or pipe-separated alternatives in the existing text array. Validate/split centrally before asset rendering; keep old singleton records compatible and group boundaries visible with overlapping icons and wider gaps. Strategies on both sides, Power Spots and Flank Watch support these lineups.
+- Bank is now the startup map, with first-map fallback. Added Attack-only Flank Watch using the shared multi-site photo-entry editor; category/side metadata is centralized.
+- Prepared the additive Flank Watch constraint migration; not applied to production. No squad records or media changed. Local shell v7 / adapter URL v6 coordinate the release. Current production remains 6ab4eeb.
+- Meaningful UI and shared-adapter checks cover groups, legacy values, save/edit/remove, side restrictions, Power Spot/Flank Watch behavior and Bank selection. Isolated browser preview verifies actual interactions and responsive controls. See knowledge/operator-alternatives.md and knowledge/flank-watch.md.
+Category-order clarification, 29 October: Attack displays Strategies followed by Flank Watch, with Site setups hidden and creation disabled. Defense keeps Power Spots, Strategies, Site setups. Legacy attack setup records are preserved in storage. Offline UI checks cover visibility, editor access and order.
+
+29 October deployment: user authorized release to the existing URL. Verified prior source 6ab4eeb and prior live constraint definitions. Applied the transactional Flank Watch constraint expansion through owner-authenticated SQL editor; live introspection confirmed the expanded category list, Attack-only Flank Watch rule and unchanged Defense-only Power Spot rule. No row/media migration was needed.
